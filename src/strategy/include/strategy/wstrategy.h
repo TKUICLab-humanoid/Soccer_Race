@@ -9,7 +9,6 @@
 ///////tku_libs///////
 #include "tku_libs/strategy_info.h"
 #include "tku_libs/TKU_tool.h"
-#include "tku_libs/strategy_base.h"
 #include "tku_libs/RosCommunication.h"
 ///////tku_msgs///////
 #include "tku_msgs/SensorPackage.h"
