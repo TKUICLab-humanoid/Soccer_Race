@@ -1,4 +1,4 @@
-//--------------------------------------
+//---------------------------------------
 #include "strategy/attacker/head_strategy.h"
 //----------------libs-------------------
 #include "tku_libs/strategy_info.h"

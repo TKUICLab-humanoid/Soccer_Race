@@ -9,15 +9,13 @@ project(strategy)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
 	cv_bridge
-	genmsg 
  	image_transport 
 	message_generation
 	roscpp
-	roslib
 	sensor_msgs
 	std_msgs
-	tku_msgs
 	tku_libs
+	tku_msgs
 )
 
 find_package(OpenCV REQUIRED)
@@ -55,27 +53,43 @@ catkin_package(
 )
 
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
+	include
+	${catkin_INCLUDE_DIRS}
+	${OpenCV_INCLUDE_DIRS}
 )
 
 ## attacker
 add_executable(attacker
-				Kidsize_RoboCup/attacker/strategy_main.cpp
-				Kidsize_RoboCup/attacker/head_strategy.cpp)
+	Kidsize_RoboCup/attacker/strategy_main.cpp
+	Kidsize_RoboCup/attacker/head_strategy.cpp
+)
 add_dependencies(attacker ${catkin_EXPORTED_TARGETS})
 target_link_libraries(attacker ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
 
+##collaboration
+add_executable(example
+	Kidsize_RoboCup/collaboration/example_strategy_main.cpp
+)
+add_dependencies(example ${catkin_EXPORTED_TARGETS})
+target_link_libraries(example ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
+
+add_executable(collaboration
+	Kidsize_RoboCup/collaboration/strategy_main.cpp
+)
+add_dependencies(collaboration ${catkin_EXPORTED_TARGETS})
+target_link_libraries(collaboration ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
+
 ##goalkeeper
 add_executable(goalkeeper
-				Kidsize_RoboCup/goalkeeper/strategy_main.cpp
-				Kidsize_RoboCup/goalkeeper/head_strategy.cpp)
+	Kidsize_RoboCup/goalkeeper/strategy_main.cpp
+	Kidsize_RoboCup/goalkeeper/head_strategy.cpp
+)
 add_dependencies(goalkeeper ${catkin_EXPORTED_TARGETS})
 target_link_libraries(goalkeeper ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
 
 ##substitute
 add_executable(substitute
-				Kidsize_RoboCup/substitute/strategy_main.cpp)
+	Kidsize_RoboCup/substitute/strategy_main.cpp
+)
 add_dependencies(substitute ${catkin_EXPORTED_TARGETS})
 target_link_libraries(substitute ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
