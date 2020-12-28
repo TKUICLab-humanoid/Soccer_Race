@@ -1,6 +1,6 @@
 -
   state:
-    whichRobot: 'robot1'
+    which_robot: 'robot1'
     robot1: 'attacker'
     robot2: 'null'
     robot3: 'null'
