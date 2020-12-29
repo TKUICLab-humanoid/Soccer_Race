@@ -48,6 +48,7 @@ void KidsizeStrategy::strategyMain()
 				ROS_INFO("None");
 				break;
 		}
+		getSoccerInfo();
 		roboCupInformation();
   	}
 	else //strategy not running
@@ -59,34 +60,90 @@ void KidsizeStrategy::strategyMain()
 void KidsizeStrategy::roboCupInformation()
 {
 	count++;
-	robotCupInfo->characterInfo->who["myself"]->x = count;
+	robotCupInfo->characterInfo->who["myself"]->object[0].x = soccer_x;
+	robotCupInfo->characterInfo->who["myself"]->object[0].y = soccer_y;
+	robotCupInfo->characterInfo->who["myself"]->object[0].exist_flag = get_soccer_flag;
 	ros2MultiCom->sendRobotCupInfo(robotCupInfo);
 	robotCupInfo->characterInfo->testShow();
 	robotCupInfo->characterInfo->testShowTimer();
 	robotCupInfo->characterInfo->setTimerPass(1000, false);
 	ROS_INFO("PRS = %s", robotCupInfo->characterInfo->getPRS().c_str());
 
-	if(count == 10)
+	// if(count == 10)
+	// {
+	// 	robotCupInfo->characterInfo->changeMyself("suporter1");
+	// 	robotCupInfo->characterInfo->checkRobotCharacter();
+	// }
+	// if(count == 20)
+	// {
+	// 	robotCupInfo->characterInfo->changeMyself("suporter2");
+	// 	robotCupInfo->characterInfo->checkRobotCharacter();
+	// }
+	// if(count == 30)
+	// {
+	// 	robotCupInfo->characterInfo->changeMyself("defender");
+	// 	robotCupInfo->characterInfo->checkRobotCharacter();
+	// }
+	// if(count == 40)
+	// {
+	// 	robotCupInfo->characterInfo->changeMyself("attacker");
+	// 	robotCupInfo->characterInfo->checkRobotCharacter();
+	// 	count = 0;
+	// }
+}
+
+void KidsizeStrategy::getSoccerInfo()
+{
+	ROS_INFO("soccer_info size = %d", strategy_info->soccer_info.size());
+	if(strategy_info->soccer_info.size()<=4)
 	{
-		robotCupInfo->characterInfo->changeMyself("suporter1");
-		robotCupInfo->characterInfo->checkRobotCharacter();
+		get_soccer_flag = false;
+		get_goal_flag = false;
+		goal_cnt = 0;
+		for (int i = 0; i < strategy_info->soccer_info.size(); i++)
+		{
+			if (strategy_info->soccer_info[i].object_mode == ObjectMode::SOCCER)
+			{
+				soccer_width = strategy_info->soccer_info[i].width;
+				soccer_height = strategy_info->soccer_info[i].height;
+				soccer_x = strategy_info->soccer_info[i].x + (soccer_width / 2);
+				soccer_y = strategy_info->soccer_info[i].y + (soccer_height / 2);
+				soccer_size = soccer_width * soccer_height;
+				get_soccer_flag = true;
+
+			}
+			else if (strategy_info->soccer_info[i].object_mode == ObjectMode::GOAL)
+			{
+				if(goal_cnt == 0)
+				{
+					goal_width[0] = strategy_info->soccer_info[i].width;
+					goal_height[0] = strategy_info->soccer_info[i].height;
+					goal_x[0] = strategy_info->soccer_info[i].x + (goal_width[0] / 2);
+					goal_y[0] = strategy_info->soccer_info[i].y + (goal_height[0] / 2);
+					get_goal_flag = true;
+					goal_cnt = 1;
+				}
+				else if(goal_cnt == 1)
+				{
+					goal_width[1] = strategy_info->soccer_info[i].width;
+					goal_height[1] = strategy_info->soccer_info[i].height;
+					goal_x[1] = strategy_info->soccer_info[i].x + (goal_width[1] / 2);
+					goal_y[1] = strategy_info->soccer_info[i].y + (goal_height[1] / 2);
+					get_goal_flag = true;
+					goal_cnt = 2;
+					ROS_INFO("i n 2");
+					
+				}
+			}
+			else if ((int)strategy_info->soccer_info[i].object_mode == (int)ObjectMode::NOTHING)
+			{
+				get_soccer_flag = false;
+				get_goal_flag = false;
+			}
+		}
+		ROS_INFO("soccer size = %d", soccer_size);
 	}
-	if(count == 20)
-	{
-		robotCupInfo->characterInfo->changeMyself("suporter2");
-		robotCupInfo->characterInfo->checkRobotCharacter();
-	}
-	if(count == 30)
-	{
-		robotCupInfo->characterInfo->changeMyself("defender");
-		robotCupInfo->characterInfo->checkRobotCharacter();
-	}
-	if(count == 40)
-	{
-		robotCupInfo->characterInfo->changeMyself("attacker");
-		robotCupInfo->characterInfo->checkRobotCharacter();
-		count = 0;
-	}
+	strategy_info->soccer_info.clear();
 }
 
 KidsizeStrategy::KidsizeStrategy()
@@ -99,8 +156,36 @@ KidsizeStrategy::KidsizeStrategy()
 	robotCupInfo = RobotCupInfo::getInstance();
 	client.start();
 
+	get_soccer_flag = false;
+	get_goal_flag = false;
 	count = 0;
-};
+	soccer_x = -1;
+	soccer_y = -1;
+	soccer_width = -1;
+	soccer_height = -1;
+	soccer_size = -1;
+	for(int i = 0; i < (sizeof(goal_x)/sizeof(goal_x[0])); i++)
+	{
+		goal_x[i] = -1;
+	}
+	for(int i = 0; i < (sizeof(goal_y)/sizeof(goal_y[0])); i++)
+	{
+		goal_y[i] = -1;
+	}
+	for(int i = 0; i < (sizeof(goal_width)/sizeof(goal_width[0])); i++)
+	{
+		goal_width[i] = -1;
+	}
+	for(int i = 0; i < (sizeof(goal_height)/sizeof(goal_height[0])); i++)
+	{
+		goal_height[i] = -1;
+	}
+	for(int i = 0; i < (sizeof(goal_size)/sizeof(goal_size[0])); i++)
+	{
+		goal_size[i] = -1;
+	}
+	goal_cnt = -1;
+}
 
 KidsizeStrategy::~KidsizeStrategy()
 {
@@ -110,4 +195,4 @@ KidsizeStrategy::~KidsizeStrategy()
 	WalkContinuouseInstance::deleteInstance();
 	Ros2MultiCommunication::deleteInstance();
 	RobotCupInfo::deleteInstance();
-};
+}

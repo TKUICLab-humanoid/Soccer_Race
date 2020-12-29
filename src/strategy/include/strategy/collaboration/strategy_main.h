@@ -19,9 +19,7 @@ class KidsizeStrategy
 
 		void strategyMain();
 		void roboCupInformation();
-
-	public:
-		int count;
+		void getSoccerInfo();
 
 	private:
 		StrategyInfoInstance *strategy_info;
@@ -32,4 +30,18 @@ class KidsizeStrategy
 		RobotCupInfo *robotCupInfo;
 		RefereeClient client;
 
+		bool get_soccer_flag;
+		bool get_goal_flag;
+		int count;
+		int soccer_x;
+		int soccer_y;
+		int soccer_width;
+		int soccer_height;
+		int soccer_size;
+		int goal_x[2];
+		int goal_y[2];
+		int goal_width[2];
+		int goal_height[2];
+		int goal_size[2];
+		int goal_cnt;
 };
