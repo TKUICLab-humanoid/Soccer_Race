@@ -30,3 +30,7 @@
 	path = src/package
 	url = https://github.com/TKUICLab-humanoid/motionpackage_submodule.git
 	branch = master
+[submodule "src/realsense-ros"]
+	path = src/realsense-ros
+	url = https://github.com/TKUICLab-humanoid/realsense-ros_submodule.git
+	branch = master
