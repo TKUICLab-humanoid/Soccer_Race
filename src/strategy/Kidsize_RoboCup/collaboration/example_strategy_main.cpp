@@ -34,12 +34,12 @@ void KidsizeGazebo::strategymain()
 
 	if(count == 10)
 	{
-		robotCupInfo->characterInfo->changeMyself("suporter1");
+		robotCupInfo->characterInfo->changeMyself("supporter1");
 		robotCupInfo->characterInfo->checkRobotCharacter();
 	}
 	if(count == 20)
 	{
-		robotCupInfo->characterInfo->changeMyself("suporter2");
+		robotCupInfo->characterInfo->changeMyself("supporter2");
 		robotCupInfo->characterInfo->checkRobotCharacter();
 	}
 	if(count == 30)

@@ -60,9 +60,9 @@ void KidsizeStrategy::strategyMain()
 void KidsizeStrategy::roboCupInformation()
 {
 	count++;
-	robotCupInfo->characterInfo->who["myself"]->object[0].x = soccer_x;
-	robotCupInfo->characterInfo->who["myself"]->object[0].y = soccer_y;
-	robotCupInfo->characterInfo->who["myself"]->object[0].exist_flag = get_soccer_flag;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].x = soccer_x;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].y = soccer_y;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = get_soccer_flag;
 	ros2MultiCom->sendRobotCupInfo(robotCupInfo);
 	robotCupInfo->characterInfo->testShow();
 	robotCupInfo->characterInfo->testShowTimer();
@@ -71,12 +71,12 @@ void KidsizeStrategy::roboCupInformation()
 
 	// if(count == 10)
 	// {
-	// 	robotCupInfo->characterInfo->changeMyself("suporter1");
+	// 	robotCupInfo->characterInfo->changeMyself("supporter1");
 	// 	robotCupInfo->characterInfo->checkRobotCharacter();
 	// }
 	// if(count == 20)
 	// {
-	// 	robotCupInfo->characterInfo->changeMyself("suporter2");
+	// 	robotCupInfo->characterInfo->changeMyself("supporter2");
 	// 	robotCupInfo->characterInfo->checkRobotCharacter();
 	// }
 	// if(count == 30)
@@ -159,32 +159,32 @@ KidsizeStrategy::KidsizeStrategy()
 	get_soccer_flag = false;
 	get_goal_flag = false;
 	count = 0;
-	soccer_x = -1;
-	soccer_y = -1;
-	soccer_width = -1;
-	soccer_height = -1;
-	soccer_size = -1;
+	soccer_x = 0;
+	soccer_y = 0;
+	soccer_width = 0;
+	soccer_height = 0;
+	soccer_size = 0;
 	for(int i = 0; i < (sizeof(goal_x)/sizeof(goal_x[0])); i++)
 	{
-		goal_x[i] = -1;
+		goal_x[i] = 0;
 	}
 	for(int i = 0; i < (sizeof(goal_y)/sizeof(goal_y[0])); i++)
 	{
-		goal_y[i] = -1;
+		goal_y[i] = 0;
 	}
 	for(int i = 0; i < (sizeof(goal_width)/sizeof(goal_width[0])); i++)
 	{
-		goal_width[i] = -1;
+		goal_width[i] = 0;
 	}
 	for(int i = 0; i < (sizeof(goal_height)/sizeof(goal_height[0])); i++)
 	{
-		goal_height[i] = -1;
+		goal_height[i] = 0;
 	}
 	for(int i = 0; i < (sizeof(goal_size)/sizeof(goal_size[0])); i++)
 	{
-		goal_size[i] = -1;
+		goal_size[i] = 0;
 	}
-	goal_cnt = -1;
+	goal_cnt = 0;
 }
 
 KidsizeStrategy::~KidsizeStrategy()
