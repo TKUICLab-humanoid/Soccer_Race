@@ -9,17 +9,38 @@
 #include "tku_libs/Ros2MultiCommunication.h"
 #include "tku_libs/robocup_referee/referee_client.h"
 
+#include "tku_msgs/LocalizationPos.h"
+#include "tku_msgs/RobotPos.h"
+
 using namespace robocup_referee;
+
+struct Coordinate
+{
+    int x;
+    int y;
+};
+
+struct RobotData
+{
+	bool robotFlag;
+	int theta;
+
+	Coordinate position;
+};
 
 class KidsizeStrategy
 {
 	public:
-		KidsizeStrategy();
+		KidsizeStrategy(ros::NodeHandle &nh);
 		~KidsizeStrategy();
 
 		void strategyMain();
-		void roboCupInformation();
 		void getSoccerInfo();
+		void chooseLocalizationMethod();
+		void roboCupInformation();
+
+	public:
+		void getLocalizationPositionFunction(const tku_msgs::LocalizationPos &msg);
 
 	private:
 		StrategyInfoInstance *strategy_info;
@@ -30,11 +51,15 @@ class KidsizeStrategy
 		RobotCupInfo *robotCupInfo;
 		RefereeClient client;
 
-		bool get_soccer_flag;
+		ros::Publisher RobotPos_Publisher;
+
+		ros::Subscriber localizationPos_Subscriber;
+
+		tku_msgs::RobotPos robotPosition;
+
+	private:
 		bool get_goal_flag;
 		int count;
-		int soccer_x;
-		int soccer_y;
 		int soccer_width;
 		int soccer_height;
 		int soccer_size;
@@ -44,4 +69,6 @@ class KidsizeStrategy
 		int goal_height[2];
 		int goal_size[2];
 		int goal_cnt;
+
+		RobotData localizationPosition;
 };
