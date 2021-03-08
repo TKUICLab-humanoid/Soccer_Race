@@ -23,9 +23,34 @@ struct Coordinate
 struct RobotData
 {
 	bool robotFlag;
-	int theta;
+	float theta;
+	float weight;
 
 	Coordinate position;
+};
+
+struct SoccerData
+{
+	bool existFlag;
+	int x;
+	int y;
+	int width;
+	int height;
+	int size;
+	int x_dis;
+	int y_dis;
+	float theta;
+};
+
+struct GoalData
+{
+	bool existFlag;
+	int x[2];
+	int y[2];
+	int width[2];
+	int height[2];
+	int size[2];
+	int cnt;
 };
 
 class KidsizeStrategy
@@ -35,9 +60,12 @@ class KidsizeStrategy
 		~KidsizeStrategy();
 
 		void strategyMain();
-		void getSoccerInfo();
 		void chooseLocalizationMethod();
+		void getSoccerInfo();
 		void roboCupInformation();
+		void robotDataInitialize();
+		void soccerDataInitialize();
+		void goalDataInitialize();
 
 	public:
 		void getLocalizationPositionFunction(const tku_msgs::LocalizationPos &msg);
@@ -58,17 +86,9 @@ class KidsizeStrategy
 		tku_msgs::RobotPos robotPosition;
 
 	private:
-		bool get_goal_flag;
 		int count;
-		int soccer_width;
-		int soccer_height;
-		int soccer_size;
-		int goal_x[2];
-		int goal_y[2];
-		int goal_width[2];
-		int goal_height[2];
-		int goal_size[2];
-		int goal_cnt;
 
 		RobotData localizationPosition;
+		SoccerData soccer;
+		GoalData goal;
 };

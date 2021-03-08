@@ -25,7 +25,8 @@ int main(int argc, char** argv)
 void KidsizeGazebo::strategymain()
 {
 	count++;
-	robotCupInfo->characterInfo->who["myself"]->x = count;
+	robotCupInfo->characterInfo->who["myself"]->global.x_pos = count;
+	robotCupInfo->characterInfo->who["myself"]->local.x_pos = count;
 	ros2MultiCom->sendRobotCupInfo(robotCupInfo);
 	robotCupInfo->characterInfo->testShow();
 	robotCupInfo->characterInfo->testShowTimer();

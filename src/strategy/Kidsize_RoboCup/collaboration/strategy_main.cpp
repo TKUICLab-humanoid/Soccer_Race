@@ -27,7 +27,6 @@ void KidsizeStrategy::strategyMain()
 	std::cout << &client.getGameState() << std::endl;
   	if(strategy_info->getStrategyStart() || client.getGameState().getActualGameState() != -1) //strategy start running
 	{
-		getSoccerInfo();
 		switch(client.getGameState().getActualGameState())
 		{
 			case 0:
@@ -50,69 +49,14 @@ void KidsizeStrategy::strategyMain()
 				break;
 		}
 		chooseLocalizationMethod();
+		getSoccerInfo();
 		roboCupInformation();
   	}
 	else //strategy not running
 	{
+		roboCupInformation();
 		ROS_INFO("Unconnect GameController");
 	}
-}
-
-void KidsizeStrategy::getSoccerInfo()
-{
-	soccer_size = 0;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = false;
-	get_goal_flag = false;
-	ROS_INFO("soccer_info size = %d", strategy_info->soccer_info.size());
-	if(0 < strategy_info->soccer_info.size() && strategy_info->soccer_info.size() <= 4)
-	{
-		goal_cnt = 0;
-		for(int i = 0; i < strategy_info->soccer_info.size(); i++)
-		{
-			if(strategy_info->soccer_info[i].object_mode == ObjectMode::SOCCER)
-			{
-				soccer_width = strategy_info->soccer_info[i].width;
-				soccer_height = strategy_info->soccer_info[i].height;
-				soccer_size = soccer_width * soccer_height;
-				robotCupInfo->characterInfo->who["myself"]->object["soccer"].x = strategy_info->soccer_info[i].x + (soccer_width / 2);
-				robotCupInfo->characterInfo->who["myself"]->object["soccer"].y = strategy_info->soccer_info[i].y + (soccer_height / 2);
-				robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = true;
-			}
-			else if(strategy_info->soccer_info[i].object_mode == ObjectMode::GOAL)
-			{
-				if(goal_cnt == 0)
-				{
-					goal_width[0] = strategy_info->soccer_info[i].width;
-					goal_height[0] = strategy_info->soccer_info[i].height;
-					goal_x[0] = strategy_info->soccer_info[i].x + (goal_width[0] / 2);
-					goal_y[0] = strategy_info->soccer_info[i].y + (goal_height[0] / 2);
-					get_goal_flag = true;
-					goal_cnt = 1;
-				}
-				else if(goal_cnt == 1)
-				{
-					goal_width[1] = strategy_info->soccer_info[i].width;
-					goal_height[1] = strategy_info->soccer_info[i].height;
-					goal_x[1] = strategy_info->soccer_info[i].x + (goal_width[1] / 2);
-					goal_y[1] = strategy_info->soccer_info[i].y + (goal_height[1] / 2);
-					get_goal_flag = true;
-					goal_cnt = 2;
-					ROS_INFO("i n 2");
-				}
-			}
-			else if((int)strategy_info->soccer_info[i].object_mode == (int)ObjectMode::NOTHING)
-			{
-				robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = false;
-				get_goal_flag = false;
-			}
-		}
-		ROS_INFO("soccer size = %d", soccer_size);
-	}
-	else
-	{
-		ROS_INFO("No soccer");
-	}
-	strategy_info->soccer_info.clear();
 }
 
 void KidsizeStrategy::chooseLocalizationMethod()
@@ -131,7 +75,83 @@ void KidsizeStrategy::chooseLocalizationMethod()
 		robotPosition.y = localizationPosition.position.y;
 		robotPosition.dir = localizationPosition.theta;
 	}
+	robotCupInfo->characterInfo->who["myself"]->global.x_pos = robotPosition.x;
+	robotCupInfo->characterInfo->who["myself"]->global.y_pos = robotPosition.y;
+	robotCupInfo->characterInfo->who["myself"]->global.theta = robotPosition.dir;
+	robotCupInfo->characterInfo->who["myself"]->local.x_pos = robotPosition.x;
+	robotCupInfo->characterInfo->who["myself"]->local.y_pos = robotPosition.y;
+	robotCupInfo->characterInfo->who["myself"]->local.theta = robotPosition.dir;
+
 	RobotPos_Publisher.publish(robotPosition);
+}
+
+void KidsizeStrategy::getSoccerInfo()
+{
+	soccerDataInitialize();
+	goalDataInitialize();
+	
+	ROS_INFO("soccer_info size = %d", strategy_info->soccer_info.size());
+	if(0 < strategy_info->soccer_info.size() && strategy_info->soccer_info.size() <= 4)
+	{
+		for(int i = 0; i < strategy_info->soccer_info.size(); i++)
+		{
+			if(strategy_info->soccer_info[i].object_mode == ObjectMode::SOCCER)
+			{
+				soccer.width = strategy_info->soccer_info[i].width;
+				soccer.height = strategy_info->soccer_info[i].height;
+				soccer.size = soccer.width * soccer.height;
+				soccer.x = strategy_info->soccer_info[i].x + (soccer.width / 2);
+				soccer.y = strategy_info->soccer_info[i].y + (soccer.height / 2);
+				soccer.x_dis = strategy_info->soccer_info[i].x_distance;
+				soccer.y_dis = strategy_info->soccer_info[i].y_distance;
+				soccer.theta = atan2(soccer.x_dis, soccer.y_dis);
+				soccer.existFlag = true;
+			}
+			else if(strategy_info->soccer_info[i].object_mode == ObjectMode::GOAL)
+			{
+				if(goal.cnt == 0)
+				{
+					goal.width[0] = strategy_info->soccer_info[i].width;
+					goal.height[0] = strategy_info->soccer_info[i].height;
+					goal.x[0] = strategy_info->soccer_info[i].x + (goal.width[0] / 2);
+					goal.y[0] = strategy_info->soccer_info[i].y + (goal.height[0] / 2);
+					goal.cnt = 1;
+					goal.existFlag = true;
+				}
+				else if(goal.cnt == 1)
+				{
+					goal.width[1] = strategy_info->soccer_info[i].width;
+					goal.height[1] = strategy_info->soccer_info[i].height;
+					goal.x[1] = strategy_info->soccer_info[i].x + (goal.width[1] / 2);
+					goal.y[1] = strategy_info->soccer_info[i].y + (goal.height[1] / 2);
+					goal.cnt = 2;
+					goal.existFlag = true;
+					ROS_INFO("i n 2");
+				}
+			}
+			else if((int)strategy_info->soccer_info[i].object_mode == (int)ObjectMode::NOTHING)
+			{
+				
+			}
+		}
+		ROS_INFO("soccer size = %d", soccer.size);
+	}
+	else
+	{
+		ROS_INFO("No soccer");
+	}
+
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = soccer.existFlag;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.x_pos = soccer.x_dis;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.y_pos = soccer.y_dis;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.theta = soccer.theta;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.x_pos = robotPosition.x + soccer.x_dis;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.y_pos = robotPosition.y + soccer.y_dis;
+	robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.theta = robotPosition.dir + soccer.theta;
+
+	robotCupInfo->characterInfo->who["myself"]->object["goal"].exist_flag = goal.existFlag;
+
+	strategy_info->soccer_info.clear();
 }
 
 void KidsizeStrategy::roboCupInformation()
@@ -171,7 +191,56 @@ void KidsizeStrategy::getLocalizationPositionFunction(const tku_msgs::Localizati
 	localizationPosition.position.x = msg.x;
     localizationPosition.position.y = msg.y;
     localizationPosition.theta = msg.dir;
+	localizationPosition.weight = msg.weight;
 	localizationPosition.robotFlag = msg.robotFlag;
+}
+
+void KidsizeStrategy::robotDataInitialize()
+{
+	localizationPosition.position.x = 0;
+	localizationPosition.position.y = 0;
+	localizationPosition.theta = 0.0;
+	localizationPosition.weight = 0.0;
+	localizationPosition.robotFlag = false;
+}
+
+void KidsizeStrategy::soccerDataInitialize()
+{
+	soccer.existFlag = false;
+	soccer.width = 0;
+	soccer.height = 0;
+	soccer.size = 0;
+	soccer.x = 0;
+	soccer.y = 0;
+	soccer.x_dis = 0;
+	soccer.y_dis = 0;
+	soccer.theta = 0.0;
+}
+
+void KidsizeStrategy::goalDataInitialize()
+{
+	goal.existFlag = false;
+	for(int i = 0; i < (sizeof(goal.x)/sizeof(goal.x[0])); i++)
+	{
+		goal.x[i] = 0;
+	}
+	for(int i = 0; i < (sizeof(goal.y)/sizeof(goal.y[0])); i++)
+	{
+		goal.y[i] = 0;
+	}
+	for(int i = 0; i < (sizeof(goal.width)/sizeof(goal.width[0])); i++)
+	{
+		goal.width[i] = 0;
+	}
+	for(int i = 0; i < (sizeof(goal.height)/sizeof(goal.height[0])); i++)
+	{
+		goal.height[i] = 0;
+	}
+	for(int i = 0; i < (sizeof(goal.size)/sizeof(goal.size[0])); i++)
+	{
+		goal.size[i] = 0;
+	}
+	goal.cnt = 0;
 }
 
 KidsizeStrategy::KidsizeStrategy(ros::NodeHandle &nh)
@@ -192,37 +261,13 @@ KidsizeStrategy::KidsizeStrategy(ros::NodeHandle &nh)
 	robotPosition.y = 0;
 	robotPosition.dir = 0;
 
-	get_goal_flag = false;
 	count = 0;
-	soccer_width = 0;
-	soccer_height = 0;
-	soccer_size = 0;
-	for(int i = 0; i < (sizeof(goal_x)/sizeof(goal_x[0])); i++)
-	{
-		goal_x[i] = 0;
-	}
-	for(int i = 0; i < (sizeof(goal_y)/sizeof(goal_y[0])); i++)
-	{
-		goal_y[i] = 0;
-	}
-	for(int i = 0; i < (sizeof(goal_width)/sizeof(goal_width[0])); i++)
-	{
-		goal_width[i] = 0;
-	}
-	for(int i = 0; i < (sizeof(goal_height)/sizeof(goal_height[0])); i++)
-	{
-		goal_height[i] = 0;
-	}
-	for(int i = 0; i < (sizeof(goal_size)/sizeof(goal_size[0])); i++)
-	{
-		goal_size[i] = 0;
-	}
-	goal_cnt = 0;
 
-	localizationPosition.position.x = 0;
-	localizationPosition.position.y = 0;
-	localizationPosition.theta = 0;
-	localizationPosition.robotFlag = false;
+	robotDataInitialize();
+
+	soccerDataInitialize();
+	
+	goalDataInitialize();
 }
 
 KidsizeStrategy::~KidsizeStrategy()
