@@ -5,4 +5,6 @@ devel/
 
 \.catkin_workspace
 
+\.vscode
+
 *.ods

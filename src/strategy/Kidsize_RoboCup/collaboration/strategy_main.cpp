@@ -87,6 +87,10 @@ void KidsizeStrategy::chooseLocalizationMethod()
 
 void KidsizeStrategy::getSoccerInfo()
 {
+	int tmp_x = robotPosition.x;
+	int tmp_y = robotPosition.y;
+ 	float tmp_theta = robotPosition.dir;
+
 	soccerDataInitialize();
 	goalDataInitialize();
 	
@@ -142,16 +146,47 @@ void KidsizeStrategy::getSoccerInfo()
 	}
 
 	robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = soccer.existFlag;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.x_pos = soccer.x_dis;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.y_pos = soccer.y_dis;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.theta = soccer.theta;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.x_pos = robotPosition.x + soccer.x_dis;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.y_pos = robotPosition.y + soccer.y_dis;
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.theta = robotPosition.dir + soccer.theta;
+	if(soccer.existFlag)
+	{
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.x_pos = soccer.x_dis;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.y_pos = soccer.y_dis;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.theta = soccer.theta;
+		tmp_theta = Angle_Adjustment(robotPosition.dir + soccer.theta);
+		tmp_x = robotPosition.x + cos(tmp_theta * DEG2RAD);
+		tmp_y = robotPosition.y - sin(tmp_theta * DEG2RAD);
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.x_pos = tmp_x;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.y_pos = tmp_y;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.theta = tmp_theta;
+	}
+	else
+	{
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.x_pos = 0;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.y_pos = 0;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.theta = 0.0;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.x_pos = 0;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.y_pos = 0;
+		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.theta = 0.0;
+	}
 
 	robotCupInfo->characterInfo->who["myself"]->object["goal"].exist_flag = goal.existFlag;
 
 	strategy_info->soccer_info.clear();
+}
+
+float KidsizeStrategy::Angle_Adjustment(float angle)
+{
+    if(angle < 0.0)
+	{
+        return angle + 360.0;
+	}
+    else if(angle >= 360.0)
+	{
+        return angle - 360.0;
+	}
+    else
+	{
+        return angle;
+	}
 }
 
 void KidsizeStrategy::roboCupInformation()

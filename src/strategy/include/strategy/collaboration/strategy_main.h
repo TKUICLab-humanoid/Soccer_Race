@@ -12,6 +12,8 @@
 #include "tku_msgs/LocalizationPos.h"
 #include "tku_msgs/RobotPos.h"
 
+#define DEG2RAD M_PI/180
+
 using namespace robocup_referee;
 
 struct Coordinate
@@ -62,6 +64,7 @@ class KidsizeStrategy
 		void strategyMain();
 		void chooseLocalizationMethod();
 		void getSoccerInfo();
+		float Angle_Adjustment(float angle);
 		void roboCupInformation();
 		void robotDataInitialize();
 		void soccerDataInitialize();
