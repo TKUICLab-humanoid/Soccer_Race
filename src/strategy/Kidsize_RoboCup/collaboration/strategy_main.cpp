@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 	KidsizeStrategy KidsizeStrategy(nh);
 
-	ros::Rate loop_rate(15);
+	ros::Rate loop_rate(30);
 
 	while (nh.ok())
 	{
@@ -54,7 +54,6 @@ void KidsizeStrategy::strategyMain()
   	}
 	else //strategy not running
 	{
-		roboCupInformation();
 		ROS_INFO("Unconnect GameController");
 	}
 }
@@ -144,6 +143,14 @@ void KidsizeStrategy::getSoccerInfo()
 	{
 		ROS_INFO("No soccer");
 	}
+
+	ROS_INFO("localizationPosition.robotFlag: %d", localizationPosition.robotFlag);
+	ROS_INFO("robotPosition.x: %d", robotPosition.x);
+	ROS_INFO("robotPosition.y: %d", robotPosition.y);
+	ROS_INFO("robotPosition.dir: %f", robotPosition.dir);
+	ROS_INFO("soccer.x_dis: %d", soccer.x_dis);
+	ROS_INFO("soccer.y_dis: %d", soccer.y_dis);
+	ROS_INFO("soccer.theta: %f", soccer.theta);
 
 	robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = soccer.existFlag;
 	if(soccer.existFlag)
