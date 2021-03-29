@@ -1,0 +1,18 @@
+(cl:in-package tku_msgs-msg)
+(cl:export '(KICK_POINT_X-VAL
+          KICK_POINT_X
+          KICK_POINT_Y-VAL
+          KICK_POINT_Y
+          KICK_POINT_Z-VAL
+          KICK_POINT_Z
+          BACK_POINT_X-VAL
+          BACK_POINT_X
+          BACK_POINT_Z-VAL
+          BACK_POINT_Z
+          SUPPORT_FOOT_HIP_UPPER_PITCH-VAL
+          SUPPORT_FOOT_HIP_UPPER_PITCH
+          KICK_FOOT_ANKLE_UPPER_PITCH-VAL
+          KICK_FOOT_ANKLE_UPPER_PITCH
+          SUPPORT_FOOT_ANKLE_UPPER_PITCH-VAL
+          SUPPORT_FOOT_ANKLE_UPPER_PITCH
+))

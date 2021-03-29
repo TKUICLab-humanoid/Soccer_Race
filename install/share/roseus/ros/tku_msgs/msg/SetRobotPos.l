@@ -1,0 +1,99 @@
+;; Auto-generated. Do not edit!
+
+
+(when (boundp 'tku_msgs::SetRobotPos)
+  (if (not (find-package "TKU_MSGS"))
+    (make-package "TKU_MSGS"))
+  (shadow 'SetRobotPos (find-package "TKU_MSGS")))
+(unless (find-package "TKU_MSGS::SETROBOTPOS")
+  (make-package "TKU_MSGS::SETROBOTPOS"))
+
+(in-package "ROS")
+;;//! \htmlinclude SetRobotPos.msg.html
+
+
+(defclass tku_msgs::SetRobotPos
+  :super ros::object
+  :slots (_number _x _y _dir ))
+
+(defmethod tku_msgs::SetRobotPos
+  (:init
+   (&key
+    ((:number __number) 0)
+    ((:x __x) 0)
+    ((:y __y) 0)
+    ((:dir __dir) 0)
+    )
+   (send-super :init)
+   (setq _number (round __number))
+   (setq _x (round __x))
+   (setq _y (round __y))
+   (setq _dir (round __dir))
+   self)
+  (:number
+   (&optional __number)
+   (if __number (setq _number __number)) _number)
+  (:x
+   (&optional __x)
+   (if __x (setq _x __x)) _x)
+  (:y
+   (&optional __y)
+   (if __y (setq _y __y)) _y)
+  (:dir
+   (&optional __dir)
+   (if __dir (setq _dir __dir)) _dir)
+  (:serialization-length
+   ()
+   (+
+    ;; int16 _number
+    2
+    ;; int16 _x
+    2
+    ;; int16 _y
+    2
+    ;; int16 _dir
+    2
+    ))
+  (:serialize
+   (&optional strm)
+   (let ((s (if strm strm
+              (make-string-output-stream (send self :serialization-length)))))
+     ;; int16 _number
+       (write-word _number s)
+     ;; int16 _x
+       (write-word _x s)
+     ;; int16 _y
+       (write-word _y s)
+     ;; int16 _dir
+       (write-word _dir s)
+     ;;
+     (if (null strm) (get-output-stream-string s))))
+  (:deserialize
+   (buf &optional (ptr- 0))
+   ;; int16 _number
+     (setq _number (sys::peek buf ptr- :short)) (incf ptr- 2)
+   ;; int16 _x
+     (setq _x (sys::peek buf ptr- :short)) (incf ptr- 2)
+   ;; int16 _y
+     (setq _y (sys::peek buf ptr- :short)) (incf ptr- 2)
+   ;; int16 _dir
+     (setq _dir (sys::peek buf ptr- :short)) (incf ptr- 2)
+   ;;
+   self)
+  )
+
+(setf (get tku_msgs::SetRobotPos :md5sum-) "19f4baebbc12c880780ca548bf4b0c0b")
+(setf (get tku_msgs::SetRobotPos :datatype-) "tku_msgs/SetRobotPos")
+(setf (get tku_msgs::SetRobotPos :definition-)
+      "int16 number
+int16 x
+int16 y
+int16 dir
+
+")
+
+
+
+(provide :tku_msgs/SetRobotPos "19f4baebbc12c880780ca548bf4b0c0b")
+
+

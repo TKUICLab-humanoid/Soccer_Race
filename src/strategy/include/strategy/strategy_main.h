@@ -42,7 +42,7 @@ class KidsizeStrategy
 
 		ros::Subscriber RobotPos_subscribe;
 		ros::Subscriber GetSetGoalPoint_subscribe;
-
+		tku_msgs::GetVelocity get_velocity;
 		tku_msgs::RobotPos robot_pos;
 
 		coordinate goal_pos;

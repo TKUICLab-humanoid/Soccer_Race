@@ -1,0 +1,8 @@
+prefix=/home/wen/Soccer_Race/install
+
+Name: tku_libs
+Description: Description of tku_libs
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -ltku_libs -lroscommunication -lros2multicommunication -lgamecontrollerclient -ltku_gz_libs
+Requires: roscpp tku_msgs sensor_msgs cv_bridge roslib message_filters

@@ -33,6 +33,7 @@
 #include <sstream>
 #include <vector>
 #include <stdio.h>
+#include <time.h>
 
 #define PI 3.14159
 
@@ -46,20 +47,14 @@ enum strategy_state
 
 strategy_state m_state = P_INIT;
 
-struct coordinate
-{
-    int X;
-    int Y;
-};
-
 using namespace std;
 
 
 class Wstrategy
 {
     
-    	coordinate goal_pos;
-      coordinate goal_pos_init;
+    	cv::Point goal_pos;
+      cv::Point goal_pos_init;
 
       bool catch_pos_flag ;
       bool continous_flag ;
@@ -68,6 +63,7 @@ class Wstrategy
       int continous_x;
       int continous_y;
     public:
+      time_t start, end;
       ros::NodeHandle *nh;
       ros::Publisher  GetVelocity_Publisher; 
       Wstrategy(ros::NodeHandle &nh);
@@ -75,13 +71,13 @@ class Wstrategy
       RosCommunicationInstance *ros_com;
       ToolInstance *tool;
       StrategyInfoInstance *strategy_info;
-
+      int moving;
       void Init();
       void Track();
       void Turn();
 
       void StrategyEnd();
-      void publishparam(int continous_x,int continous_y, int continous_angle);
+      void publishparam(int continous_x,int continous_y, int continous_angle, int moving);
       int checkangle(int angle,int limit);
       int checkcontinousX(int x,int limit);
 

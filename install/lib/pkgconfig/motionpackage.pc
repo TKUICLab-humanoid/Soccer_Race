@@ -1,0 +1,8 @@
+prefix=/home/wen/Soccer_Race/install
+
+Name: motionpackage
+Description: Description of motionpackage
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: message_runtime std_msgs roscpp

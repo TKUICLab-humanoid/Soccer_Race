@@ -1,0 +1,8 @@
+prefix=/home/wen/Soccer_Race/install
+
+Name: strategy
+Description: Description of strategy
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -ltku_libs -lroscommunication -lros2multicommunication
+Requires: 

@@ -1,0 +1,8 @@
+prefix=/home/wen/Soccer_Race/install
+
+Name: walkinggait
+Description: Description of walkinggait
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: 

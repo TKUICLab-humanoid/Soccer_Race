@@ -25,10 +25,11 @@ set(STRATEGYBASE_LIBRARIES ${CATKIN_DEVEL_PREFIX}/lib/libroscommunication.so)
 # find_package(Boost REQUIRED COMPONENTS system)
 
 ## Generate messages in the 'msg' folder
-add_message_files(DIRECTORY msg
-	FILES
-	DeepMatrix.msg
-)
+#add_message_files(DIRECTORY msg
+#	FILES
+#	DeepMatrix.msg
+#	GetVelocity.msg
+#)
 ## Generate services in the 'srv' folder
 #add_service_files(DIRECTORY srv 
 #	FILES
@@ -56,7 +57,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(strategy Kidsize_HuroCup/wstrategy.cpp)
+add_executable(strategy Kidsize_RoboCup/wstrategy.cpp)
 add_dependencies(strategy ${catkin_EXPORTED_TARGETS})
 target_link_libraries(strategy ${catkin_LIBRARIES} ${TKU_LIBRARIES} ${STRATEGYBASE_LIBRARIES})
 
