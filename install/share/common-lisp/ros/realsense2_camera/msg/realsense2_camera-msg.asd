@@ -9,4 +9,6 @@
     (:file "_package_Extrinsics" :depends-on ("_package"))
     (:file "IMUInfo" :depends-on ("_package_IMUInfo"))
     (:file "_package_IMUInfo" :depends-on ("_package"))
+    (:file "IMUdata" :depends-on ("_package_IMUdata"))
+    (:file "_package_IMUdata" :depends-on ("_package"))
   ))

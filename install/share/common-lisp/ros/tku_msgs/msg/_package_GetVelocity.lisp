@@ -5,4 +5,8 @@
           Y
           THTA-VAL
           THTA
+          MOVING-VAL
+          MOVING
+          DT-VAL
+          DT
 ))

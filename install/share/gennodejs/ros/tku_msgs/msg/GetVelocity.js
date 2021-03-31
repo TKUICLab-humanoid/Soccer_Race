@@ -21,6 +21,8 @@ class GetVelocity {
       this.x = null;
       this.y = null;
       this.thta = null;
+      this.moving = null;
+      this.dt = null;
     }
     else {
       if (initObj.hasOwnProperty('x')) {
@@ -41,6 +43,18 @@ class GetVelocity {
       else {
         this.thta = 0;
       }
+      if (initObj.hasOwnProperty('moving')) {
+        this.moving = initObj.moving
+      }
+      else {
+        this.moving = 0;
+      }
+      if (initObj.hasOwnProperty('dt')) {
+        this.dt = initObj.dt
+      }
+      else {
+        this.dt = 0.0;
+      }
     }
   }
 
@@ -52,6 +66,10 @@ class GetVelocity {
     bufferOffset = _serializer.int32(obj.y, buffer, bufferOffset);
     // Serialize message field [thta]
     bufferOffset = _serializer.int32(obj.thta, buffer, bufferOffset);
+    // Serialize message field [moving]
+    bufferOffset = _serializer.int32(obj.moving, buffer, bufferOffset);
+    // Serialize message field [dt]
+    bufferOffset = _serializer.float32(obj.dt, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -65,11 +83,15 @@ class GetVelocity {
     data.y = _deserializer.int32(buffer, bufferOffset);
     // Deserialize message field [thta]
     data.thta = _deserializer.int32(buffer, bufferOffset);
+    // Deserialize message field [moving]
+    data.moving = _deserializer.int32(buffer, bufferOffset);
+    // Deserialize message field [dt]
+    data.dt = _deserializer.float32(buffer, bufferOffset);
     return data;
   }
 
   static getMessageSize(object) {
-    return 12;
+    return 20;
   }
 
   static datatype() {
@@ -79,7 +101,7 @@ class GetVelocity {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '608e030db4b1da323a9f83bf257ec356';
+    return '9c1928b39f88a3cb1c7d866aa8964520';
   }
 
   static messageDefinition() {
@@ -88,6 +110,9 @@ class GetVelocity {
     int32 x
     int32 y
     int32 thta
+    int32 moving
+    float32 dt
+    
     `;
   }
 
@@ -116,6 +141,20 @@ class GetVelocity {
     }
     else {
       resolved.thta = 0
+    }
+
+    if (msg.moving !== undefined) {
+      resolved.moving = msg.moving;
+    }
+    else {
+      resolved.moving = 0
+    }
+
+    if (msg.dt !== undefined) {
+      resolved.dt = msg.dt;
+    }
+    else {
+      resolved.dt = 0.0
     }
 
     return resolved;

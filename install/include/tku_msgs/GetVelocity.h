@@ -26,12 +26,16 @@ struct GetVelocity_
   GetVelocity_()
     : x(0)
     , y(0)
-    , thta(0)  {
+    , thta(0)
+    , moving(0)
+    , dt(0.0)  {
     }
   GetVelocity_(const ContainerAllocator& _alloc)
     : x(0)
     , y(0)
-    , thta(0)  {
+    , thta(0)
+    , moving(0)
+    , dt(0.0)  {
   (void)_alloc;
     }
 
@@ -45,6 +49,12 @@ struct GetVelocity_
 
    typedef int32_t _thta_type;
   _thta_type thta;
+
+   typedef int32_t _moving_type;
+  _moving_type moving;
+
+   typedef float _dt_type;
+  _dt_type dt;
 
 
 
@@ -77,7 +87,9 @@ bool operator==(const ::tku_msgs::GetVelocity_<ContainerAllocator1> & lhs, const
 {
   return lhs.x == rhs.x &&
     lhs.y == rhs.y &&
-    lhs.thta == rhs.thta;
+    lhs.thta == rhs.thta &&
+    lhs.moving == rhs.moving &&
+    lhs.dt == rhs.dt;
 }
 
 template<typename ContainerAllocator1, typename ContainerAllocator2>
@@ -134,12 +146,12 @@ struct MD5Sum< ::tku_msgs::GetVelocity_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "608e030db4b1da323a9f83bf257ec356";
+    return "9c1928b39f88a3cb1c7d866aa8964520";
   }
 
   static const char* value(const ::tku_msgs::GetVelocity_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x608e030db4b1da32ULL;
-  static const uint64_t static_value2 = 0x3a9f83bf257ec356ULL;
+  static const uint64_t static_value1 = 0x9c1928b39f88a3cbULL;
+  static const uint64_t static_value2 = 0x1c7d866aa8964520ULL;
 };
 
 template<class ContainerAllocator>
@@ -161,6 +173,8 @@ struct Definition< ::tku_msgs::GetVelocity_<ContainerAllocator> >
     return "int32 x\n"
 "int32 y\n"
 "int32 thta\n"
+"int32 moving\n"
+"float32 dt\n"
 ;
   }
 
@@ -182,6 +196,8 @@ namespace serialization
       stream.next(m.x);
       stream.next(m.y);
       stream.next(m.thta);
+      stream.next(m.moving);
+      stream.next(m.dt);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -206,6 +222,10 @@ struct Printer< ::tku_msgs::GetVelocity_<ContainerAllocator> >
     Printer<int32_t>::stream(s, indent + "  ", v.y);
     s << indent << "thta: ";
     Printer<int32_t>::stream(s, indent + "  ", v.thta);
+    s << indent << "moving: ";
+    Printer<int32_t>::stream(s, indent + "  ", v.moving);
+    s << indent << "dt: ";
+    Printer<float>::stream(s, indent + "  ", v.dt);
   }
 };
 
