@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(realsense2_camera_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "include " STREQUAL " ")
+if(NOT "include;/usr/include " STREQUAL " ")
   set(realsense2_camera_INCLUDE_DIRS "")
-  set(_include_dirs "include")
+  set(_include_dirs "include;/usr/include")
   if(NOT "https://github.com/intel-ros/realsense/issues " STREQUAL " ")
     set(_report "Check the issue tracker 'https://github.com/intel-ros/realsense/issues' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT "http://www.ros.org/wiki/RealSense " STREQUAL " ")
@@ -116,7 +116,7 @@ if(NOT "include " STREQUAL " ")
   endforeach()
 endif()
 
-set(libraries "realsense2_camera")
+set(libraries "realsense2_camera;imu_filter;imu_filter_nodelet;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_thread.so;/usr/lib/x86_64-linux-gnu/libboost_chrono.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_atomic.so;/usr/lib/x86_64-linux-gnu/libpthread.so")
 foreach(library ${libraries})
   # keep build configuration keywords, target names and absolute libraries as-is
   if("${library}" MATCHES "^(debug|optimized|general)$")
@@ -177,7 +177,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(realsense2_camera_EXPORTED_TARGETS "realsense2_camera_generate_messages_cpp;realsense2_camera_generate_messages_eus;realsense2_camera_generate_messages_lisp;realsense2_camera_generate_messages_nodejs;realsense2_camera_generate_messages_py")
+set(realsense2_camera_EXPORTED_TARGETS "realsense2_camera_generate_messages_cpp;realsense2_camera_generate_messages_eus;realsense2_camera_generate_messages_lisp;realsense2_camera_generate_messages_nodejs;realsense2_camera_generate_messages_py;realsense2_camera_gencfg")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${realsense2_camera_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
@@ -185,7 +185,7 @@ foreach(t ${realsense2_camera_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "message_runtime;roscpp;sensor_msgs;std_msgs;nodelet;cv_bridge;image_transport;ddynamic_reconfigure;nav_msgs")
+set(depends "message_runtime;roscpp;sensor_msgs;std_msgs;geometry_msgs;tf2_ros;tf2_geometry_msgs;nodelet;pluginlib;message_filters;dynamic_reconfigure;nodelet;cv_bridge;image_transport;ddynamic_reconfigure;nav_msgs")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
