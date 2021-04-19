@@ -62,6 +62,7 @@ class KidsizeStrategy
 		~KidsizeStrategy();
 
 		void strategyMain();
+		void strategyInit();
 		void chooseLocalizationMethod();
 		void getSoccerInfo();
 		float Angle_Adjustment(float angle);

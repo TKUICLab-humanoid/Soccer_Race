@@ -10,11 +10,11 @@ int main(int argc, char** argv)
 
 	while (nh.ok())
 	{
-		if(system("clear"))
-		{
-			std::cerr << "Failed to clear terminal" << std::endl;
-			exit(EXIT_FAILURE);
-		}
+		// if(system("clear"))
+		// {
+		// 	std::cerr << "Failed to clear terminal" << std::endl;
+		// 	exit(EXIT_FAILURE);
+		// }
 		ros::spinOnce();
 		KidsizeStrategy.strategyMain();
 		loop_rate.sleep();
@@ -50,7 +50,7 @@ void KidsizeStrategy::strategyMain()
 		}
 		chooseLocalizationMethod();
 		getSoccerInfo();
-		roboCupInformation();
+		// roboCupInformation();
   	}
 	else //strategy not running
 	{
@@ -90,7 +90,7 @@ void KidsizeStrategy::getSoccerInfo()
 	int tmp_y = robotPosition.y;
  	float tmp_theta = robotPosition.dir;
 
-	soccerDataInitialize();
+	// soccerDataInitialize();
 	goalDataInitialize();
 	
 	ROS_INFO("soccer_info size = %d", strategy_info->soccer_info.size());
@@ -129,7 +129,7 @@ void KidsizeStrategy::getSoccerInfo()
 					goal.y[1] = strategy_info->soccer_info[i].y + (goal.height[1] / 2);
 					goal.cnt = 2;
 					goal.existFlag = true;
-					ROS_INFO("i n 2");
+					// ROS_INFO("i n 2");
 				}
 			}
 			else if((int)strategy_info->soccer_info[i].object_mode == (int)ObjectMode::NOTHING)
@@ -310,6 +310,13 @@ KidsizeStrategy::KidsizeStrategy(ros::NodeHandle &nh)
 	soccerDataInitialize();
 	
 	goalDataInitialize();
+
+	tool->Delay(500);
+    ros_com->sendHeadMotor(HeadMotorID::HorizontalID, 2048, 200);
+    tool->Delay(50);
+    ros_com->sendHeadMotor(HeadMotorID::VerticalID, 1700, 200);
+    tool->Delay(50);
+    ros_com->sendSensorReset();//IMU值重製
 }
 
 KidsizeStrategy::~KidsizeStrategy()
