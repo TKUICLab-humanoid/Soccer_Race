@@ -1,12 +1,12 @@
 
 "use strict";
 
+let IMUdata = require('./IMUdata.js');
 let IMUInfo = require('./IMUInfo.js');
 let Extrinsics = require('./Extrinsics.js');
-let IMUdata = require('./IMUdata.js');
 
 module.exports = {
+  IMUdata: IMUdata,
   IMUInfo: IMUInfo,
   Extrinsics: Extrinsics,
-  IMUdata: IMUdata,
 };

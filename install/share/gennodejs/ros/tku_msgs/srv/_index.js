@@ -1,16 +1,16 @@
 
 "use strict";
 
-let HSVInfo = require('./HSVInfo.js')
-let BGRInfo = require('./BGRInfo.js')
-let HoughInfo = require('./HoughInfo.js')
-let SaveHSV = require('./SaveHSV.js')
 let BuildModel = require('./BuildModel.js')
+let BGRInfo = require('./BGRInfo.js')
+let HSVInfo = require('./HSVInfo.js')
+let SaveHSV = require('./SaveHSV.js')
+let HoughInfo = require('./HoughInfo.js')
 
 module.exports = {
-  HSVInfo: HSVInfo,
-  BGRInfo: BGRInfo,
-  HoughInfo: HoughInfo,
-  SaveHSV: SaveHSV,
   BuildModel: BuildModel,
+  BGRInfo: BGRInfo,
+  HSVInfo: HSVInfo,
+  SaveHSV: SaveHSV,
+  HoughInfo: HoughInfo,
 };

@@ -1,4 +1,4 @@
-prefix=/home/wen/Soccer_Race/install
+prefix=/home/tkurc1/Desktop/GuanWen/Soccer_Race/install
 
 Name: walkinggait
 Description: Description of walkinggait

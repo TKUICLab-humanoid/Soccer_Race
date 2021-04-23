@@ -13,7 +13,9 @@
 
 #include "imu_filter/imu_filter.h"
 #include "imu_filter/ImuFilterMadgwickConfig.h"
-
+#ifndef PI
+const double PI = 3.14159265358979323846;
+#endif
 class ImuFilterRos
 {
   typedef sensor_msgs::Imu              ImuMsg;
@@ -40,7 +42,6 @@ class ImuFilterRos
     boost::shared_ptr<Synchronizer> sync_;
 
     ros::Publisher rpy_filtered_debug_publisher_;
-    ros::Publisher rpy_raw_debug_publisher_;
     ros::Publisher imu_publisher_;
     tf2_ros::TransformBroadcaster tf_broadcaster_;
 
@@ -54,7 +55,6 @@ class ImuFilterRos
     std::string fixed_frame_;
     std::string imu_frame_;
     double constant_dt_;
-    bool publish_debug_topics_;
     bool remove_gravity_vector_;
     double orientation_variance_;
 
@@ -71,9 +71,6 @@ class ImuFilterRos
 
     void publishFilteredMsg(const ImuMsg::ConstPtr& imu_msg_raw);
     void publishTransform(const ImuMsg::ConstPtr& imu_msg_raw);
-
-    void publishRawMsg(const ros::Time& t,
-                       float roll, float pitch, float yaw);
 
     void reconfigCallback(FilterConfig& config, uint32_t level);
     void checkTopicsTimerCallback(const ros::TimerEvent&);
