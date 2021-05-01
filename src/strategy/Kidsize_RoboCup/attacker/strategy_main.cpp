@@ -109,70 +109,71 @@ void KidsizeStrategy::initialInfo()
 
 void KidsizeStrategy::getSoccerInfo()
 {
-	//ROS_INFO("size = %d",strategy_info->soccer_info.size());
-	if(strategy_info->soccer_info.size()<=4)
+	//ROS_INFO("size = %d",strategy_info->objectInfo.size());
+	if(strategy_info->objectInfo.size()<=4)
 	{
-	/*soccer_x = strategy_info->getSoccerData().x + (strategy_info->getSoccerData().width) / 2;
-	soccer_y = strategy_info->getSoccerData().y + (strategy_info->getSoccerData().height) / 2;
-	soccer_width = strategy_info->getSoccerData().width;
-	soccer_height = strategy_info->getSoccerData().height;
-	get_soccer_flag = strategy_info->getSoccerData().get_flag;
+		/*soccer_x = strategy_info->getObjectData().x + (strategy_info->getObjectData().width) / 2;
+		soccer_y = strategy_info->getObjectData().y + (strategy_info->getObjectData().height) / 2;
+		soccer_width = strategy_info->getObjectData().width;
+		soccer_height = strategy_info->getObjectData().height;
+		get_soccer_flag = strategy_info->getObjectData().get_flag;
 
-	soccer_size = strategy_info->getSoccerData().width * strategy_info->getSoccerData().height;
-	*/
-	get_soccer_flag = false;
-	get_goal_flag = false;
-	goal_cnt = 0;
-	//ROS_INFO("size = %d",strategy_info->soccer_info.size());
+		soccer_size = strategy_info->getObjectData().width * strategy_info->getObjectData().height;
+		*/
+		get_soccer_flag = false;
+		get_goal_flag = false;
+		goal_cnt = 0;
+		//ROS_INFO("size = %d",strategy_info->objectInfo.size());
 
-	for (int i = 0; i < strategy_info->soccer_info.size(); i++)
-	{
-		if (strategy_info->soccer_info[i].object_mode == ObjectMode::SOCCER)
+		for (int i = 0; i < strategy_info->objectInfo.size(); i++)
 		{
-			soccer_width = strategy_info->soccer_info[i].width;
-			soccer_height = strategy_info->soccer_info[i].height;
-			soccer_x = strategy_info->soccer_info[i].x + (soccer_width / 2);
-			soccer_y = strategy_info->soccer_info[i].y + (soccer_height / 2);
-			soccer_size = soccer_width * soccer_height;
-			get_soccer_flag = true;
-
-		}
-		else if (strategy_info->soccer_info[i].object_mode == ObjectMode::GOAL)
-		{
-			if(goal_cnt == 0)
+			if (strategy_info->objectInfo[i].object_mode == ObjectMode::SOCCER)
 			{
-				goal_width[0] = strategy_info->soccer_info[i].width;
-				goal_height[0] = strategy_info->soccer_info[i].height;
-				goal_x[0] = strategy_info->soccer_info[i].x + (goal_width[0] / 2);
-				goal_y[0] = strategy_info->soccer_info[i].y + (goal_height[0] / 2);
-				get_goal_flag = true;
-				goal_cnt = 1;
-			}
-			else if(goal_cnt == 1)
-			{
-				goal_width[1] = strategy_info->soccer_info[i].width;
-				goal_height[1] = strategy_info->soccer_info[i].height;
-				goal_x[1] = strategy_info->soccer_info[i].x + (goal_width[1] / 2);
-				goal_y[1] = strategy_info->soccer_info[i].y + (goal_height[1] / 2);
-				get_goal_flag = true;
-				goal_cnt = 2;
-				ROS_INFO("i n 2");
-				
-			}
-			//ROS_INFO("goal_x = %d,goal_y = %d",goal_x,goal_y);
+				soccer_width = strategy_info->objectInfo[i].width;
+				soccer_height = strategy_info->objectInfo[i].height;
+				soccer_x = strategy_info->objectInfo[i].x + (soccer_width / 2);
+				soccer_y = strategy_info->objectInfo[i].y + (soccer_height / 2);
+				soccer_size = soccer_width * soccer_height;
+				get_soccer_flag = true;
 
+			}
+			else if (strategy_info->objectInfo[i].object_mode == ObjectMode::GOAL)
+			{
+				if(goal_cnt == 0)
+				{
+					goal_width[0] = strategy_info->objectInfo[i].width;
+					goal_height[0] = strategy_info->objectInfo[i].height;
+					goal_x[0] = strategy_info->objectInfo[i].x + (goal_width[0] / 2);
+					goal_y[0] = strategy_info->objectInfo[i].y + (goal_height[0] / 2);
+					get_goal_flag = true;
+					goal_cnt = 1;
+				}
+				else if(goal_cnt == 1)
+				{
+					goal_width[1] = strategy_info->objectInfo[i].width;
+					goal_height[1] = strategy_info->objectInfo[i].height;
+					goal_x[1] = strategy_info->objectInfo[i].x + (goal_width[1] / 2);
+					goal_y[1] = strategy_info->objectInfo[i].y + (goal_height[1] / 2);
+					get_goal_flag = true;
+					goal_cnt = 2;
+					ROS_INFO("i n 2");
+					
+				}
+				//ROS_INFO("goal_x = %d,goal_y = %d",goal_x,goal_y);
+
+			}
+			else if ((int)strategy_info->objectInfo[i].object_mode == (int)ObjectMode::NOTHING)
+			{
+				get_soccer_flag = false;
+				get_goal_flag = false;
+			}
+			//strategy_info->objectInfo.clear();
 		}
-		else if ((int)strategy_info->soccer_info[i].object_mode == (int)ObjectMode::NOTHING)
-		{
-			get_soccer_flag = false;
-			get_goal_flag = false;
-		}
-		//strategy_info->soccer_info.clear();
+
+		strategy_info->objectInfo.clear();
 	}
 
-	strategy_info->soccer_info.clear();
-}
-	strategy_info->soccer_info.clear();
+	strategy_info->objectInfo.clear();
 }
 
 void KidsizeStrategy::imu_check(int range)

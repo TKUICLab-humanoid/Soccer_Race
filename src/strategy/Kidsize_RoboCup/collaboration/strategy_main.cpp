@@ -48,9 +48,9 @@ void KidsizeStrategy::strategyMain()
 				ROS_INFO("None");
 				break;
 		}
-		chooseLocalizationMethod();
-		getSoccerInfo();
-		// roboCupInformation();
+		calculateRobotPosition();
+		calculateObjectPosition();
+		transmitRoboCupInfo();
   	}
 	else //strategy not running
 	{
@@ -58,81 +58,345 @@ void KidsizeStrategy::strategyMain()
 	}
 }
 
-void KidsizeStrategy::chooseLocalizationMethod()
+void KidsizeStrategy::calculateRobotPosition()
 {
-	if(localizationPosition.robotFlag)
+	int weightCnt;
+	float robotX;
+	float robotY;
+	float robotTheta;
+	float weight;
+
+	if(localizationPosition.weight >= highThreshold)
 	{
-		ROS_INFO("MultiRobot Localization");
-		robotPosition.x = localizationPosition.position.x;
-		robotPosition.y = localizationPosition.position.y;
-		robotPosition.dir = localizationPosition.theta;
+		ROS_INFO("RobotPosition Section 1; Weight above highThreshold");
+		robotX = localizationPosition.position.x;
+		robotY = localizationPosition.position.y;
+		robotTheta = localizationPosition.theta;
+		weight = localizationPosition.weight;
 	}
-	else
+	else if(localizationPosition.weight < highThreshold && localizationPosition.weight >= lowThreshold)
 	{
-		ROS_INFO("MultiRobot Localization");
-		robotPosition.x = localizationPosition.position.x;
-		robotPosition.y = localizationPosition.position.y;
-		robotPosition.dir = localizationPosition.theta;
+		ROS_INFO("RobotPosition Section 2; Weight under highThreshold and above lowThreshold");
+		robotX = localizationPosition.position.x * localizationPosition.weight;
+		robotY = localizationPosition.position.y * localizationPosition.weight;
+		robotTheta = localizationPosition.theta * localizationPosition.weight;
+		weight = localizationPosition.weight;
+		weightCnt = 1;
+
+		for(std::map<std::string, CharacterInfo*>::iterator it = robotCupInfo->characterInfo->who.begin(); it != robotCupInfo->characterInfo->who.end(); it++)
+		{
+			if(it->first != itMyself->first && it->first != itMyself->second->which_robot)
+			{
+				if(it->second->partner[itMyself->second->which_robot].exist_flag == true && it->second->weight >= localizationPosition.weight)
+				{
+					robotX += (it->second->partner[itMyself->second->which_robot].global.x_pos * it->second->weight);
+					robotY += (it->second->partner[itMyself->second->which_robot].global.y_pos * it->second->weight);
+					robotTheta += (it->second->partner[itMyself->second->which_robot].global.theta * it->second->weight);
+					weight += it->second->weight;
+					weightCnt++;
+				}
+			}
+		}
+
+		if(weightCnt >= 2)
+		{
+			robotX /= weight;
+			robotY /= weight;
+			robotTheta /= weight;
+			weight /= weightCnt;
+		}
+		else
+		{
+			robotX = localizationPosition.position.x;
+			robotY = localizationPosition.position.y;
+			robotTheta = localizationPosition.theta;
+			weight = localizationPosition.weight;
+		}
 	}
-	robotCupInfo->characterInfo->who["myself"]->global.x_pos = robotPosition.x;
-	robotCupInfo->characterInfo->who["myself"]->global.y_pos = robotPosition.y;
-	robotCupInfo->characterInfo->who["myself"]->global.theta = robotPosition.dir;
-	robotCupInfo->characterInfo->who["myself"]->local.x_pos = robotPosition.x;
-	robotCupInfo->characterInfo->who["myself"]->local.y_pos = robotPosition.y;
-	robotCupInfo->characterInfo->who["myself"]->local.theta = robotPosition.dir;
+	else if(localizationPosition.weight < lowThreshold)
+	{
+		ROS_INFO("RobotPosition Section 3; Weight under lowThreshold");
+		robotX = 0.0;
+		robotY = 0.0;
+		robotTheta = 0.0;
+		weight = 0.0;
+		weightCnt = 0;
+
+		for(std::map<std::string, CharacterInfo*>::iterator it = robotCupInfo->characterInfo->who.begin(); it != robotCupInfo->characterInfo->who.end(); it++)
+		{
+			if(it->first != itMyself->first && it->first != itMyself->second->which_robot)
+			{
+				if(it->second->partner[itMyself->second->which_robot].exist_flag == true && it->second->weight >= lowThreshold)
+				{
+					robotX += (it->second->partner[itMyself->second->which_robot].global.x_pos * it->second->weight);
+					robotY += (it->second->partner[itMyself->second->which_robot].global.y_pos * it->second->weight);
+					robotTheta += (it->second->partner[itMyself->second->which_robot].global.theta * it->second->weight);
+					weight += it->second->weight;
+					weightCnt++;
+				}
+			}
+		}
+
+		if(weightCnt >= 1)
+		{
+			robotX /= weight;
+			robotY /= weight;
+			robotTheta /= weight;
+			weight /= weightCnt;
+		}
+		else
+		{
+			robotX = localizationPosition.position.x;
+			robotY = localizationPosition.position.y;
+			robotTheta = localizationPosition.theta;
+			weight = localizationPosition.weight;
+		}
+	}
+	
+	itMyself->second->weight = weight;
+	itMyself->second->global.x_pos = (int)robotX;
+	itMyself->second->global.y_pos = (int)robotY;
+	itMyself->second->global.theta = robotTheta;
+	itMyself->second->local.x_pos = (int)robotX;
+	itMyself->second->local.y_pos = (int)robotY;
+	itMyself->second->local.theta = robotTheta;
+
+	robotPosition.x = (int)robotX;
+	robotPosition.y = (int)robotY;
+	robotPosition.dir = robotTheta;
+
+	ROS_INFO("robotPosition.x: %d", robotPosition.x);
+	ROS_INFO("robotPosition.y: %d", robotPosition.y);
+	ROS_INFO("robotPosition.dir: %f\n", robotPosition.dir);
 
 	RobotPos_Publisher.publish(robotPosition);
 }
 
+void KidsizeStrategy::calculateObjectPosition()
+{
+	getSoccerInfo();
+
+	bool soccerExistFlag;
+	int soccerCnt;
+	int weightCnt;
+	int distanceX;
+	int distanceY;
+	float soccerTmpX;
+	float soccerTmpY;
+	float soccerTmpTheta;
+	float soccerGlobalX;
+	float soccerGlobalY;
+	float soccerGlobalTheta;
+	float soccerLocalX;
+	float soccerLocalY;
+	float soccerLocalTheta;
+	float soccerWeight;
+	float weight;
+	
+	if(soccer.existFlag)
+	{
+		soccerTmpTheta = Angle_Adjustment(robotPosition.dir + soccer.theta);
+		soccerTmpX = robotPosition.x + soccer.dis * cos(soccerTmpTheta * DEG2RAD);
+		soccerTmpY = robotPosition.y - soccer.dis * sin(soccerTmpTheta * DEG2RAD);
+
+		if(localizationPosition.weight >= highThreshold)
+		{
+			ROS_INFO("ObjectPosition Section 1; Weight above highThreshold");
+			soccerGlobalX = soccerTmpX;
+			soccerGlobalY = soccerTmpY;
+			soccerGlobalTheta = soccerTmpTheta;
+			soccerLocalX = soccer.x_dis;
+			soccerLocalY = soccer.y_dis;
+			soccerLocalTheta = soccer.theta;
+		}
+		else if(localizationPosition.weight < highThreshold && localizationPosition.weight >= lowThreshold)
+		{
+			ROS_INFO("ObjectPosition Section 2; Weight under highThreshold and above lowThreshold");
+			soccerGlobalX = soccerTmpX * localizationPosition.weight;
+			soccerGlobalY = soccerTmpY * localizationPosition.weight;
+			weight = localizationPosition.weight;
+			weightCnt = 1;
+
+			for(std::map<std::string, CharacterInfo*>::iterator it = robotCupInfo->characterInfo->who.begin(); it != robotCupInfo->characterInfo->who.end(); it++)
+			{
+				if(it->first != itMyself->first && it->first != itMyself->second->which_robot)
+				{
+					if(it->second->object["soccer"].exist_flag == true && it->second->weight >= localizationPosition.weight)
+					{
+						soccerGlobalX += (it->second->object["soccer"].global.x_pos * it->second->weight);
+						soccerGlobalY += (it->second->object["soccer"].global.y_pos * it->second->weight);
+						weight += it->second->weight;
+						weightCnt++;
+					}
+				}
+			}
+
+			if(weightCnt >= 2)
+			{
+				soccerGlobalX /= weight;
+				soccerGlobalY /= weight;
+				distanceX = soccerGlobalX - robotPosition.x;
+				distanceY = -(soccerGlobalY - robotPosition.y);
+				soccerGlobalTheta = Angle_Adjustment(atan2(distanceY, distanceX) * 180 / PI);
+				soccerLocalTheta = soccerGlobalTheta - robotPosition.dir;
+				soccerLocalX = -(sqrt(pow(distanceY,2)+pow(distanceX,2)) * sin(soccerLocalTheta * DEG2RAD));
+				soccerLocalY = sqrt(pow(distanceY,2)+pow(distanceX,2)) * cos(soccerLocalTheta * DEG2RAD);
+			}
+			else
+			{
+				soccerGlobalX = soccerTmpX;
+				soccerGlobalY = soccerTmpY;
+				soccerGlobalTheta = soccerTmpTheta;
+				soccerLocalX = soccer.x_dis;
+				soccerLocalY = soccer.y_dis;
+				soccerLocalTheta = soccer.theta;
+			}
+		}
+		else if(localizationPosition.weight < lowThreshold)
+		{
+			ROS_INFO("ObjectPosition Section 3; Weight under lowThreshold");
+			soccerGlobalX = 0.0;
+			soccerGlobalY = 0.0;
+			weight = 0.0;
+			weightCnt = 0;
+
+			for(std::map<std::string, CharacterInfo*>::iterator it = robotCupInfo->characterInfo->who.begin(); it != robotCupInfo->characterInfo->who.end(); it++)
+			{
+				if(it->first != itMyself->first && it->first != itMyself->second->which_robot)
+				{
+					if(it->second->object["soccer"].exist_flag == true && it->second->weight >= lowThreshold)
+					{
+						soccerGlobalX += (it->second->object["soccer"].global.x_pos * it->second->weight);
+						soccerGlobalY += (it->second->object["soccer"].global.y_pos * it->second->weight);
+						weight += it->second->weight;
+						weightCnt++;
+					}
+				}
+			}
+
+			if(weightCnt >= 1)
+			{
+				soccerGlobalX /= weight;
+				soccerGlobalY /= weight;
+				distanceX = soccerGlobalX - robotPosition.x;
+				distanceY = -(soccerGlobalY - robotPosition.y);
+				soccerGlobalTheta = Angle_Adjustment(atan2(distanceY, distanceX) * 180 / PI);
+				soccerLocalTheta = soccerGlobalTheta - robotPosition.dir;
+				soccerLocalX = -(sqrt(pow(distanceY,2)+pow(distanceX,2)) * sin(soccerLocalTheta * DEG2RAD));
+				soccerLocalY = sqrt(pow(distanceY,2)+pow(distanceX,2)) * cos(soccerLocalTheta * DEG2RAD);
+			}
+			else
+			{
+				soccerGlobalX = soccerTmpX;
+				soccerGlobalY = soccerTmpY;
+				soccerGlobalTheta = soccerTmpTheta;
+				soccerLocalX = soccer.x_dis;
+				soccerLocalY = soccer.y_dis;
+				soccerLocalTheta = soccer.theta;
+			}
+		}
+	}
+	else
+	{
+		ROS_INFO("ObjectPosition Section 4; No Soccer");
+		soccerGlobalX = 0.0;
+		soccerGlobalY = 0.0;
+		weight = 0.0;
+		weightCnt = 0;
+
+		for(std::map<std::string, CharacterInfo*>::iterator it = robotCupInfo->characterInfo->who.begin(); it != robotCupInfo->characterInfo->who.end(); it++)
+		{
+			if(it->first != itMyself->first && it->first != itMyself->second->which_robot)
+			{
+				if(it->second->object["soccer"].exist_flag == true && it->second->weight >= lowThreshold)
+				{
+					soccerGlobalX += (it->second->object["soccer"].global.x_pos * it->second->weight);
+					soccerGlobalY += (it->second->object["soccer"].global.y_pos * it->second->weight);
+					weight += it->second->weight;
+					weightCnt++;
+				}
+			}
+		}
+
+		if(weightCnt >= 1)
+		{
+			soccerGlobalX /= weight;
+			soccerGlobalY /= weight;
+			distanceX = soccerGlobalX - robotPosition.x;
+			distanceY = -(soccerGlobalY - robotPosition.y);
+			soccerGlobalTheta = Angle_Adjustment(atan2(distanceY, distanceX) * 180 / PI);
+			soccerLocalTheta = soccerGlobalTheta - robotPosition.dir;
+			soccerLocalX = -(sqrt(pow(distanceY,2)+pow(distanceX,2)) * sin(soccerLocalTheta * DEG2RAD));
+			soccerLocalY = sqrt(pow(distanceY,2)+pow(distanceX,2)) * cos(soccerLocalTheta * DEG2RAD);
+			soccer.existFlag = true;
+		}
+		else
+		{
+			soccer.existFlag = itMyself->second->object["soccer"].exist_flag;
+			soccerGlobalX = itMyself->second->object["soccer"].global.x_pos;
+			soccerGlobalY = itMyself->second->object["soccer"].global.y_pos;
+			soccerGlobalTheta = itMyself->second->object["soccer"].global.theta;
+			soccerLocalX = itMyself->second->object["soccer"].local.x_pos;
+			soccerLocalY = itMyself->second->object["soccer"].local.y_pos;
+			soccerLocalTheta = itMyself->second->object["soccer"].local.theta;
+		}
+	}
+
+	itMyself->second->object["soccer"].exist_flag = soccer.existFlag;
+	itMyself->second->object["soccer"].global.x_pos = (int)soccerGlobalX;
+	itMyself->second->object["soccer"].global.y_pos = (int)soccerGlobalY;
+	itMyself->second->object["soccer"].global.theta = soccerGlobalTheta;
+	itMyself->second->object["soccer"].local.x_pos = (int)soccerLocalX;
+	itMyself->second->object["soccer"].local.y_pos = (int)soccerLocalY;
+	itMyself->second->object["soccer"].local.theta = soccerLocalTheta;
+}
+
 void KidsizeStrategy::getSoccerInfo()
 {
-	int tmp_x = robotPosition.x;
-	int tmp_y = robotPosition.y;
- 	float tmp_theta = robotPosition.dir;
-
-	// soccerDataInitialize();
+	soccerDataInitialize();
 	goalDataInitialize();
 	
-	ROS_INFO("soccer_info size = %d", strategy_info->soccer_info.size());
-	if(0 < strategy_info->soccer_info.size() && strategy_info->soccer_info.size() <= 4)
+	ROS_INFO("objectInfo size = %d", strategy_info->objectInfo.size());
+	if(0 < strategy_info->objectInfo.size() && strategy_info->objectInfo.size() <= 4)
 	{
-		for(int i = 0; i < strategy_info->soccer_info.size(); i++)
+		for(int i = 0; i < strategy_info->objectInfo.size(); i++)
 		{
-			if(strategy_info->soccer_info[i].object_mode == ObjectMode::SOCCER)
+			if(strategy_info->objectInfo[i].object_mode == ObjectMode::SOCCER)
 			{
-				soccer.width = strategy_info->soccer_info[i].width;
-				soccer.height = strategy_info->soccer_info[i].height;
+				soccer.width = strategy_info->objectInfo[i].width;
+				soccer.height = strategy_info->objectInfo[i].height;
 				soccer.size = soccer.width * soccer.height;
-				soccer.x = strategy_info->soccer_info[i].x + (soccer.width / 2);
-				soccer.y = strategy_info->soccer_info[i].y + (soccer.height / 2);
-				soccer.x_dis = strategy_info->soccer_info[i].x_distance;
-				soccer.y_dis = strategy_info->soccer_info[i].y_distance;
-				soccer.theta = atan2(soccer.x_dis, soccer.y_dis);
+				soccer.x = strategy_info->objectInfo[i].x + (soccer.width / 2);
+				soccer.y = strategy_info->objectInfo[i].y + (soccer.height / 2);
+				soccer.x_dis = strategy_info->objectInfo[i].x_distance;
+				soccer.y_dis = strategy_info->objectInfo[i].y_distance;
+				soccer.dis = strategy_info->objectInfo[i].distance;
+				soccer.theta = -(atan2(soccer.x_dis, soccer.y_dis) * 180 / PI);
 				soccer.existFlag = true;
 			}
-			else if(strategy_info->soccer_info[i].object_mode == ObjectMode::GOAL)
+			else if(strategy_info->objectInfo[i].object_mode == ObjectMode::GOAL)
 			{
 				if(goal.cnt == 0)
 				{
-					goal.width[0] = strategy_info->soccer_info[i].width;
-					goal.height[0] = strategy_info->soccer_info[i].height;
-					goal.x[0] = strategy_info->soccer_info[i].x + (goal.width[0] / 2);
-					goal.y[0] = strategy_info->soccer_info[i].y + (goal.height[0] / 2);
+					goal.width[0] = strategy_info->objectInfo[i].width;
+					goal.height[0] = strategy_info->objectInfo[i].height;
+					goal.x[0] = strategy_info->objectInfo[i].x + (goal.width[0] / 2);
+					goal.y[0] = strategy_info->objectInfo[i].y + (goal.height[0] / 2);
 					goal.cnt = 1;
 					goal.existFlag = true;
 				}
 				else if(goal.cnt == 1)
 				{
-					goal.width[1] = strategy_info->soccer_info[i].width;
-					goal.height[1] = strategy_info->soccer_info[i].height;
-					goal.x[1] = strategy_info->soccer_info[i].x + (goal.width[1] / 2);
-					goal.y[1] = strategy_info->soccer_info[i].y + (goal.height[1] / 2);
+					goal.width[1] = strategy_info->objectInfo[i].width;
+					goal.height[1] = strategy_info->objectInfo[i].height;
+					goal.x[1] = strategy_info->objectInfo[i].x + (goal.width[1] / 2);
+					goal.y[1] = strategy_info->objectInfo[i].y + (goal.height[1] / 2);
 					goal.cnt = 2;
 					goal.existFlag = true;
 					// ROS_INFO("i n 2");
 				}
 			}
-			else if((int)strategy_info->soccer_info[i].object_mode == (int)ObjectMode::NOTHING)
+			else if((int)strategy_info->objectInfo[i].object_mode == (int)ObjectMode::NOTHING)
 			{
 				
 			}
@@ -144,40 +408,11 @@ void KidsizeStrategy::getSoccerInfo()
 		ROS_INFO("No soccer");
 	}
 
-	ROS_INFO("localizationPosition.robotFlag: %d", localizationPosition.robotFlag);
-	ROS_INFO("robotPosition.x: %d", robotPosition.x);
-	ROS_INFO("robotPosition.y: %d", robotPosition.y);
-	ROS_INFO("robotPosition.dir: %f", robotPosition.dir);
 	ROS_INFO("soccer.x_dis: %d", soccer.x_dis);
 	ROS_INFO("soccer.y_dis: %d", soccer.y_dis);
-	ROS_INFO("soccer.theta: %f", soccer.theta);
+	ROS_INFO("soccer.theta: %f\n", soccer.theta);
 
-	robotCupInfo->characterInfo->who["myself"]->object["soccer"].exist_flag = soccer.existFlag;
-	if(soccer.existFlag)
-	{
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.x_pos = soccer.x_dis;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.y_pos = soccer.y_dis;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.theta = soccer.theta;
-		tmp_theta = Angle_Adjustment(robotPosition.dir + soccer.theta);
-		tmp_x = robotPosition.x + cos(tmp_theta * DEG2RAD);
-		tmp_y = robotPosition.y - sin(tmp_theta * DEG2RAD);
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.x_pos = tmp_x;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.y_pos = tmp_y;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.theta = tmp_theta;
-	}
-	else
-	{
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.x_pos = 0;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.y_pos = 0;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].local.theta = 0.0;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.x_pos = 0;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.y_pos = 0;
-		robotCupInfo->characterInfo->who["myself"]->object["soccer"].global.theta = 0.0;
-	}
-
-	robotCupInfo->characterInfo->who["myself"]->object["goal"].exist_flag = goal.existFlag;
-
-	strategy_info->soccer_info.clear();
+	strategy_info->objectInfo.clear();
 }
 
 float KidsizeStrategy::Angle_Adjustment(float angle)
@@ -196,36 +431,13 @@ float KidsizeStrategy::Angle_Adjustment(float angle)
 	}
 }
 
-void KidsizeStrategy::roboCupInformation()
+void KidsizeStrategy::transmitRoboCupInfo()
 {
-	count++;
 	ros2MultiCom->sendRobotCupInfo(robotCupInfo);
 	robotCupInfo->characterInfo->testShow();
 	robotCupInfo->characterInfo->testShowTimer();
 	robotCupInfo->characterInfo->setTimerPass(1000, false);
 	ROS_INFO("PRS = %s", robotCupInfo->characterInfo->getPRS().c_str());
-
-	// if(count == 10)
-	// {
-	// 	robotCupInfo->characterInfo->changeMyself("supporter1");
-	// 	robotCupInfo->characterInfo->checkRobotCharacter();
-	// }
-	// if(count == 20)
-	// {
-	// 	robotCupInfo->characterInfo->changeMyself("supporter2");
-	// 	robotCupInfo->characterInfo->checkRobotCharacter();
-	// }
-	// if(count == 30)
-	// {
-	// 	robotCupInfo->characterInfo->changeMyself("defender");
-	// 	robotCupInfo->characterInfo->checkRobotCharacter();
-	// }
-	// if(count == 40)
-	// {
-	// 	robotCupInfo->characterInfo->changeMyself("attacker");
-	// 	robotCupInfo->characterInfo->checkRobotCharacter();
-	// 	count = 0;
-	// }
 }
 
 void KidsizeStrategy::getLocalizationPositionFunction(const tku_msgs::LocalizationPos &msg)
@@ -234,29 +446,34 @@ void KidsizeStrategy::getLocalizationPositionFunction(const tku_msgs::Localizati
     localizationPosition.position.y = msg.y;
     localizationPosition.theta = msg.dir;
 	localizationPosition.weight = msg.weight;
-	localizationPosition.robotFlag = msg.robotFlag;
 }
 
-void KidsizeStrategy::robotDataInitialize()
+void KidsizeStrategy::robotPositionDataInitialize()
 {
 	localizationPosition.position.x = 0;
 	localizationPosition.position.y = 0;
 	localizationPosition.theta = 0.0;
 	localizationPosition.weight = 0.0;
-	localizationPosition.robotFlag = false;
+}
+
+void KidsizeStrategy::objectPositionDataInitialize()
+{
+	soccerPosition.position.x = 0;
+	soccerPosition.position.y = 0;
+	soccerPosition.theta = 0.0;
 }
 
 void KidsizeStrategy::soccerDataInitialize()
 {
 	soccer.existFlag = false;
-	soccer.width = 0;
-	soccer.height = 0;
-	soccer.size = 0;
-	soccer.x = 0;
-	soccer.y = 0;
-	soccer.x_dis = 0;
-	soccer.y_dis = 0;
-	soccer.theta = 0.0;
+	// soccer.width = 0;
+	// soccer.height = 0;
+	// soccer.size = 0;
+	// soccer.x = 0;
+	// soccer.y = 0;
+	// soccer.x_dis = 0;
+	// soccer.y_dis = 0;
+	// soccer.theta = 0.0;
 }
 
 void KidsizeStrategy::goalDataInitialize()
@@ -303,13 +520,15 @@ KidsizeStrategy::KidsizeStrategy(ros::NodeHandle &nh)
 	robotPosition.y = 0;
 	robotPosition.dir = 0;
 
-	count = 0;
+	robotPositionDataInitialize();
 
-	robotDataInitialize();
+	objectPositionDataInitialize();
 
 	soccerDataInitialize();
 	
 	goalDataInitialize();
+
+	itMyself = robotCupInfo->characterInfo->who.find("myself");
 
 	tool->Delay(500);
     ros_com->sendHeadMotor(HeadMotorID::HorizontalID, 2048, 200);

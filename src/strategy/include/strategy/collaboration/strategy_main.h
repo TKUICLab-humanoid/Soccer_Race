@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <math.h>
 
 //----------------libs-------------------
 #include "tku_libs/strategy_info.h"
@@ -12,7 +13,11 @@
 #include "tku_msgs/LocalizationPos.h"
 #include "tku_msgs/RobotPos.h"
 
-#define DEG2RAD M_PI/180
+#define PI               M_PI
+#define DEG2RAD          M_PI/180
+#define highThreshold    0.8
+#define lowThreshold     0.5
+
 
 using namespace robocup_referee;
 
@@ -22,11 +27,17 @@ struct Coordinate
     int y;
 };
 
-struct RobotData
+struct RobotPositionData
 {
-	bool robotFlag;
 	float theta;
 	float weight;
+
+	Coordinate position;
+};
+
+struct ObjectPositionData
+{
+	float theta;
 
 	Coordinate position;
 };
@@ -41,6 +52,7 @@ struct SoccerData
 	int size;
 	int x_dis;
 	int y_dis;
+	int dis;
 	float theta;
 };
 
@@ -62,12 +74,13 @@ class KidsizeStrategy
 		~KidsizeStrategy();
 
 		void strategyMain();
-		void strategyInit();
-		void chooseLocalizationMethod();
+		void calculateRobotPosition();
+		void calculateObjectPosition();
 		void getSoccerInfo();
 		float Angle_Adjustment(float angle);
-		void roboCupInformation();
-		void robotDataInitialize();
+		void transmitRoboCupInfo();
+		void robotPositionDataInitialize();
+		void objectPositionDataInitialize();
 		void soccerDataInitialize();
 		void goalDataInitialize();
 
@@ -90,9 +103,10 @@ class KidsizeStrategy
 		tku_msgs::RobotPos robotPosition;
 
 	private:
-		int count;
-
-		RobotData localizationPosition;
+		RobotPositionData localizationPosition;
+		ObjectPositionData soccerPosition;
 		SoccerData soccer;
 		GoalData goal;
+		
+		std::map<std::string, CharacterInfo*>::iterator itMyself;
 };

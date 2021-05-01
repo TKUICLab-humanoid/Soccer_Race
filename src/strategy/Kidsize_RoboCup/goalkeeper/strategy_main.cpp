@@ -174,34 +174,34 @@ void KidsizeStrategy::initialInfo()
 
 void KidsizeStrategy::getInfo()
 {
-	for(int i = 0;i < strategy_info->soccer_info.size();i++)
+	for(int i = 0;i < strategy_info->objectInfo.size();i++)
 	{
-		if(strategy_info->soccer_info[i].object_mode == ObjectMode::SOCCER) // soccer info
+		if(strategy_info->objectInfo[i].object_mode == ObjectMode::SOCCER) // soccer info
 		{
-			soccer_width = strategy_info->soccer_info[i].width;
-			soccer_height = strategy_info->soccer_info[i].height;
-			soccer_x = strategy_info->soccer_info[i].x + (soccer_width / 2);
-			soccer_y = strategy_info->soccer_info[i].y + (soccer_height / 2);
+			soccer_width = strategy_info->objectInfo[i].width;
+			soccer_height = strategy_info->objectInfo[i].height;
+			soccer_x = strategy_info->objectInfo[i].x + (soccer_width / 2);
+			soccer_y = strategy_info->objectInfo[i].y + (soccer_height / 2);
 			soccer_size = soccer_width * soccer_height;
-			soccer_dis = strategy_info->soccer_info[i].distance;
-			soccer_dis_x = strategy_info->soccer_info[i].x_distance;
-			soccer_dis_y = strategy_info->soccer_info[i].y_distance;
+			soccer_dis = strategy_info->objectInfo[i].distance;
+			soccer_dis_x = strategy_info->objectInfo[i].x_distance;
+			soccer_dis_y = strategy_info->objectInfo[i].y_distance;
 			get_soccer_flag = true;
 
-			if(strategy_info->soccer_info.size() == 1)
+			if(strategy_info->objectInfo.size() == 1)
 			{
 				get_goal_flag = false;
 			}
 		}
-		else if(strategy_info->soccer_info[i].object_mode == ObjectMode::GOAL) // goal info
+		else if(strategy_info->objectInfo[i].object_mode == ObjectMode::GOAL) // goal info
 		{
-			goal_width = strategy_info->soccer_info[i].width;
-			goal_height = strategy_info->soccer_info[i].height;
-			goal_x = strategy_info->soccer_info[i].x + (goal_width / 2);
-			goal_y = strategy_info->soccer_info[i].y + (goal_height / 2);
-			goal_dis = strategy_info->soccer_info[i].distance;
-			goal_dis_x = strategy_info->soccer_info[i].x_distance;
-			goal_dis_y = strategy_info->soccer_info[i].y_distance;
+			goal_width = strategy_info->objectInfo[i].width;
+			goal_height = strategy_info->objectInfo[i].height;
+			goal_x = strategy_info->objectInfo[i].x + (goal_width / 2);
+			goal_y = strategy_info->objectInfo[i].y + (goal_height / 2);
+			goal_dis = strategy_info->objectInfo[i].distance;
+			goal_dis_x = strategy_info->objectInfo[i].x_distance;
+			goal_dis_y = strategy_info->objectInfo[i].y_distance;
 			get_goal_flag = true;
 
 			if(goal_dis_y > 250)
@@ -211,12 +211,12 @@ void KidsizeStrategy::getInfo()
 
 			pre_goal_dis_y = goal_dis_y;
 
-			if(strategy_info->soccer_info.size() == 1)
+			if(strategy_info->objectInfo.size() == 1)
 			{
 				get_soccer_flag = false;
 			}
 		}
-		else if(strategy_info->soccer_info[i].object_mode == ObjectMode::NOTHING) // no soccer or goal in camera
+		else if(strategy_info->objectInfo[i].object_mode == ObjectMode::NOTHING) // no soccer or goal in camera
 		{
 			get_soccer_flag = false;
 			get_goal_flag = false;
@@ -239,7 +239,7 @@ void KidsizeStrategy::getInfo()
 		soccer_dis = pre_soccer_dis;
 	}
 
-	strategy_info->soccer_info.clear();
+	strategy_info->objectInfo.clear();
 
 	roll_value = strategy_info->getIMUValue().Roll;
 	pitch_value = strategy_info->getIMUValue().Pitch;
