@@ -67,14 +67,14 @@ set(vision_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(vision_SOURCE_PREFIX /home/tkurc1/Desktop/GuanWen/Soccer_Race/src/vision)
-  set(vision_DEVEL_PREFIX /home/tkurc1/Desktop/GuanWen/Soccer_Race/devel)
+  set(vision_SOURCE_PREFIX /home/tkurc2/Desktop/GuanWen/Soccer_Race/src/vision)
+  set(vision_DEVEL_PREFIX /home/tkurc2/Desktop/GuanWen/Soccer_Race/devel)
   set(vision_INSTALL_PREFIX "")
   set(vision_PREFIX ${vision_DEVEL_PREFIX})
 else()
   set(vision_SOURCE_PREFIX "")
   set(vision_DEVEL_PREFIX "")
-  set(vision_INSTALL_PREFIX /home/tkurc1/Desktop/GuanWen/Soccer_Race/install)
+  set(vision_INSTALL_PREFIX /home/tkurc2/Desktop/GuanWen/Soccer_Race/install)
   set(vision_PREFIX ${vision_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/tkurc1/Desktop/GuanWen/Soccer_Race/install/lib;/opt/ros/melodic/lib)
+    foreach(path /home/tkurc2/Desktop/GuanWen/Soccer_Race/install/lib;/home/tkurc2/Desktop/GuanWen/Soccer_Race/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

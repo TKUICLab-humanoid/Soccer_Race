@@ -60,7 +60,8 @@ class WalkingGaitParameterRequest(genpy.Message):
     unpack serialized message in str into this message instance
     :param str: byte array of serialized message, ``str``
     """
-    codecs.lookup_error("rosmsg").msg_type = self._type
+    if python3:
+      codecs.lookup_error("rosmsg").msg_type = self._type
     try:
       end = 0
       start = end
@@ -89,7 +90,8 @@ class WalkingGaitParameterRequest(genpy.Message):
     :param str: byte array of serialized message, ``str``
     :param numpy: numpy python module
     """
-    codecs.lookup_error("rosmsg").msg_type = self._type
+    if python3:
+      codecs.lookup_error("rosmsg").msg_type = self._type
     try:
       end = 0
       start = end
@@ -227,7 +229,8 @@ float32 Support_Foot_Ankle_Upper_Pitch"""
     unpack serialized message in str into this message instance
     :param str: byte array of serialized message, ``str``
     """
-    codecs.lookup_error("rosmsg").msg_type = self._type
+    if python3:
+      codecs.lookup_error("rosmsg").msg_type = self._type
     try:
       if self.B_SplineParam is None:
         self.B_SplineParam = tku_msgs.msg.B_SplineParam()
@@ -259,7 +262,8 @@ float32 Support_Foot_Ankle_Upper_Pitch"""
     :param str: byte array of serialized message, ``str``
     :param numpy: numpy python module
     """
-    codecs.lookup_error("rosmsg").msg_type = self._type
+    if python3:
+      codecs.lookup_error("rosmsg").msg_type = self._type
     try:
       if self.B_SplineParam is None:
         self.B_SplineParam = tku_msgs.msg.B_SplineParam()

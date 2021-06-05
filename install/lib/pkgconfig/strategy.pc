@@ -1,4 +1,4 @@
-prefix=/home/tkurc1/Desktop/GuanWen/Soccer_Race/install
+prefix=/home/tkurc2/Desktop/GuanWen/Soccer_Race/install
 
 Name: strategy
 Description: Description of strategy
