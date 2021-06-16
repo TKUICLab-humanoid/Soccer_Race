@@ -10,7 +10,7 @@ Wstrategy::Wstrategy(ros::NodeHandle &nh)
 	ros_com = RosCommunicationInstance::getInstance();
     goal_pos.x = -1;
 	goal_pos.y = -1;
-    moving = 0;
+    moving = 1;
 }
 
 int main(int argc, char** argv)
