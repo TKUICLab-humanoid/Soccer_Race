@@ -35,6 +35,7 @@ int main(int argc, char** argv)
         {
             if(wstrategy->strategy_info->getStrategyStart())
             {
+                ROS_INFO("getRobotPosition = (%d %d)",wstrategy->strategy_info->getRobotPosition().x,wstrategy->strategy_info->getRobotPosition().y);
 				reset_flag = true;
                 switch(m_state) 
                 {
@@ -85,7 +86,7 @@ void Wstrategy::Init()
     catch_pos_flag = false;
 
     m_state = P_TRACK;
-    publishparam(continous_x,continous_y,continous_angle,0);
+    publishparam(continous_x,continous_y,continous_angle,1);
 }
 
 void Wstrategy::Track()
@@ -99,8 +100,10 @@ void Wstrategy::Track()
         moving = 2;
     }else{
         moving = 1;
+        ROS_INFO("getRobotPosition = (%d %d)",strategy_info->getGoalPoint().x,strategy_info->getRobotPosition().y);
         if(strategy_info->getRobotPosition().x > 0 && strategy_info->getRobotPosition().y > 0)
         {
+            ROS_INFO("getGoalPoint = (%d %d)",strategy_info->getGoalPoint().x,strategy_info->getGoalPoint().y);
             int dis_x = strategy_info->getGoalPoint().x - strategy_info->getRobotPosition().x;
             int dis_y = -(strategy_info->getGoalPoint().y - strategy_info->getRobotPosition().y);
             int dis = sqrt(pow(dis_x,2) + pow(dis_y,2));
