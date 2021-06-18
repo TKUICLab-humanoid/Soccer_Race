@@ -35,7 +35,7 @@ int main(int argc, char** argv)
         {
             if(wstrategy->strategy_info->getStrategyStart())
             {
-                ROS_INFO("getRobotPosition = (%d %d)",wstrategy->strategy_info->getRobotPosition().x,wstrategy->strategy_info->getRobotPosition().y);
+                // ROS_INFO("getRobotPosition = (%d %d)",wstrategy->strategy_info->getRobotPosition().x,wstrategy->strategy_info->getRobotPosition().y);
 				reset_flag = true;
                 switch(m_state) 
                 {
@@ -100,9 +100,9 @@ void Wstrategy::Track()
         moving = 2;
     }else{
         moving = 1;
-        ROS_INFO("getRobotPosition = (%d %d)",strategy_info->getGoalPoint().x,strategy_info->getRobotPosition().y);
-        if(strategy_info->getRobotPosition().x > 0 && strategy_info->getRobotPosition().y > 0)
+        if(strategy_info->getRobotPosition().x >= 0 && strategy_info->getRobotPosition().y >= 0)
         {
+            ROS_INFO("getRobotPosition = (%d %d)",strategy_info->getRobotPosition().x,strategy_info->getRobotPosition().y);
             ROS_INFO("getGoalPoint = (%d %d)",strategy_info->getGoalPoint().x,strategy_info->getGoalPoint().y);
             int dis_x = strategy_info->getGoalPoint().x - strategy_info->getRobotPosition().x;
             int dis_y = -(strategy_info->getGoalPoint().y - strategy_info->getRobotPosition().y);
@@ -207,7 +207,7 @@ void Wstrategy::Track()
             else
             {
                 //continous_angle = checkangle(continous_angle,0);
-                m_state = P_END;
+                // m_state = P_END;
                 continous_flag = false;
                 //m_state = P_TURN;
             }
@@ -228,18 +228,19 @@ void Wstrategy::Track()
     }
     
 }
-
+time_t start_t, end_t;
 void Wstrategy::publishparam(int continous_x,int continous_y, int continous_angle, int moving)
 {
-    end = time(NULL);
-    float timer = difftime(end, start);
+    end = time(&end_t);
+    double timer = difftime(end, start);
+    ROS_INFO("timer = %f",timer);
     tku_msgs::GetVelocity msg_GetVelocity;
-    msg_GetVelocity.x = continous_x;
-    msg_GetVelocity.y = 0;
+    msg_GetVelocity.x = float(continous_x)/100.0;
+    msg_GetVelocity.y = 0.0;
     msg_GetVelocity.thta = continous_angle;
     msg_GetVelocity.moving = moving;
     msg_GetVelocity.dt = timer;
-    start = time(NULL);
+    start = time(&start_t);
 
     GetVelocity_Publisher.publish(msg_GetVelocity);
 }
@@ -302,7 +303,7 @@ void Wstrategy::Turn()
     else
     {
         continous_angle = checkangle(continous_angle,0);
-        m_state = P_END;
+        // m_state = P_END;
         continous_flag = false;
     }
     if(!continous_flag)
