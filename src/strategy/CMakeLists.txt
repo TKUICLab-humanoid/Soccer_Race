@@ -73,12 +73,6 @@ add_executable(example
 add_dependencies(example ${catkin_EXPORTED_TARGETS})
 target_link_libraries(example ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
 
-add_executable(collaboration
-	Kidsize_RoboCup/collaboration/strategy_main.cpp
-)
-add_dependencies(collaboration ${catkin_EXPORTED_TARGETS})
-target_link_libraries(collaboration ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${TKU_LIBRARIES} ${ROSCOMMUNICATION_LIBRARIES})
-
 ##goalkeeper
 add_executable(goalkeeper
 	Kidsize_RoboCup/goalkeeper/strategy_main.cpp
