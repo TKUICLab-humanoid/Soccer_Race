@@ -235,7 +235,7 @@ void Wstrategy::publishparam(int continous_x,int continous_y, int continous_angl
     double timer = difftime(end, start);
     ROS_INFO("timer = %f",timer);
     tku_msgs::GetVelocity msg_GetVelocity;
-    msg_GetVelocity.x = float(continous_x)/100.0;
+    msg_GetVelocity.x = float(continous_x)/1000.0;
     msg_GetVelocity.y = 0.0;
     msg_GetVelocity.thta = continous_angle;
     msg_GetVelocity.moving = moving;
@@ -303,7 +303,7 @@ void Wstrategy::Turn()
     else
     {
         continous_angle = checkangle(continous_angle,0);
-        // m_state = P_END;
+        m_state = P_END;
         continous_flag = false;
     }
     if(!continous_flag)
