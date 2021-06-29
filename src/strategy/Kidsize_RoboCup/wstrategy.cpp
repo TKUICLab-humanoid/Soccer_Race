@@ -100,7 +100,7 @@ void Wstrategy::Track()
         moving = 2;
     }else{
         moving = 1;
-        if(strategy_info->getRobotPosition().x >= 0 && strategy_info->getRobotPosition().y >= 0)
+        if(strategy_info->getRobotPosition().x >= 0 && strategy_info->getRobotPosition().y >= 0 && strategy_info->getRobotPosition().x <= 1500 && strategy_info->getRobotPosition().y <= 900)
         {
             ROS_INFO("getRobotPosition = (%d %d)",strategy_info->getRobotPosition().x,strategy_info->getRobotPosition().y);
             ROS_INFO("getGoalPoint = (%d %d)",strategy_info->getGoalPoint().x,strategy_info->getGoalPoint().y);
@@ -108,11 +108,11 @@ void Wstrategy::Track()
             int dis_y = -(strategy_info->getGoalPoint().y - strategy_info->getRobotPosition().y);
             int dis = sqrt(pow(dis_x,2) + pow(dis_y,2));
             int angle = (int)(atan2(dis_y , dis_x) * 180 / PI);
-            if(angle < 0)
+            if(angle < -180)
             {
                 angle = 360 + angle;
             }
-            else if(angle > 360)
+            else if(angle > 180)
             {
                 angle = angle - 360;
             }
@@ -127,19 +127,6 @@ void Wstrategy::Track()
                 if(angle_error > 0)
                 {
                     continous_angle++;
-                    continous_angle = checkangle(continous_angle,12);
-                }
-                else
-                {
-                    continous_angle--;
-                    continous_angle = checkangle(continous_angle,-12);
-                }
-            }
-            else if(abs(angle_error) > 20)
-            {
-                if(angle_error > 0)
-                {
-                    continous_angle++;
                     continous_angle = checkangle(continous_angle,8);
                 }
                 else
@@ -148,29 +135,43 @@ void Wstrategy::Track()
                     continous_angle = checkangle(continous_angle,-8);
                 }
             }
+            else if(abs(angle_error) > 20)
+            {
+                if(angle_error > 0)
+                {
+                    continous_angle++;
+                    continous_angle = checkangle(continous_angle,6);
+                }
+                else
+                {
+                    continous_angle--;
+                    continous_angle = checkangle(continous_angle,-6);
+                }
+            }
             else if(abs(angle_error) > 10)
             {
                 if(angle_error > 0)
                 {
                     continous_angle++;
-                    continous_angle = checkangle(continous_angle,5);
+                    continous_angle = checkangle(continous_angle,4);
                 }
                 else
                 {
                     continous_angle--;
-                    continous_angle = checkangle(continous_angle,-5);
+                    continous_angle = checkangle(continous_angle,-4);
                 }
             }
-            else if(abs(angle_error) > 2)
+            else 
+            if(abs(angle_error) > 2)
             {
                 if(angle_error > 0)
                 {
-                    continous_angle++;
+                    // continous_angle++;
                     continous_angle = checkangle(continous_angle,2);
                 }
                 else
                 {
-                    continous_angle--;
+                    // continous_angle--;
                     continous_angle = checkangle(continous_angle,-2);
                 }
             }
@@ -179,36 +180,37 @@ void Wstrategy::Track()
                 continous_angle = checkangle(continous_angle,0);
             }
 
-            if(dis > 300)
+            if(dis > 20)
             {
-                continous_x+=150;
-                continous_x = checkcontinousX(continous_x,2000);
-            }
-            else if(dis > 200)
-            {
-                continous_x+=150;
-                continous_x = checkcontinousX(continous_x,1700);
-            }
-            else if(dis > 150)
-            {
-                continous_x+=150;
-                continous_x = checkcontinousX(continous_x,1300);
-            }
-            else if(dis > 80)
-            {
-                continous_x+=100;
-                continous_x = checkcontinousX(continous_x,800);
-            }
-            else if(dis > 30)
-            {
-                continous_x+=50;
-                continous_x = checkcontinousX(continous_x,500);
+                continous_x = 3000;
+                continous_x = checkcontinousX(continous_x,3100);
+            // }
+            // else if(dis > 200)
+            // {
+            //     continous_x+=150;
+            //     continous_x = checkcontinousX(continous_x,1700);
+            // }
+            // else if(dis > 150)
+            // {
+            //     continous_x+=150;
+            //     continous_x = checkcontinousX(continous_x,1300);
+            // }
+            // else if(dis > 80)
+            // {
+            //     continous_x+=100;
+            //     continous_x = checkcontinousX(continous_x,800);
+            // }
+            // else if(dis > 30)
+            // {
+            //     continous_x+=50;
+            //     continous_x = checkcontinousX(continous_x,500);
             }
             else
             {
                 //continous_angle = checkangle(continous_angle,0);
-                // m_state = P_END;
+                
                 continous_flag = false;
+                m_state = P_END;
                 //m_state = P_TURN;
             }
             if(!continous_flag)
@@ -235,9 +237,9 @@ void Wstrategy::publishparam(int continous_x,int continous_y, int continous_angl
     double timer = difftime(end, start);
     ROS_INFO("timer = %f",timer);
     tku_msgs::GetVelocity msg_GetVelocity;
-    msg_GetVelocity.x = float(continous_x)/1000.0;
+    msg_GetVelocity.x = 3.0;
     msg_GetVelocity.y = 0.0;
-    msg_GetVelocity.thta = continous_angle;
+    msg_GetVelocity.thta = (float)1.0;
     msg_GetVelocity.moving = moving;
     msg_GetVelocity.dt = timer;
     start = time(&start_t);
