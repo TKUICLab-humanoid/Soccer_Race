@@ -122,33 +122,33 @@ void Wstrategy::Track()
             int angle_error = angle - strategy_info->getRobotPosition().dir;
             ROS_INFO("angle_error = %d",angle_error);
 
-            if(abs(angle_error) > 30)
-            {
-                if(angle_error > 0)
-                {
-                    continous_angle++;
-                    continous_angle = checkangle(continous_angle,8);
-                }
-                else
-                {
-                    continous_angle--;
-                    continous_angle = checkangle(continous_angle,-8);
-                }
-            }
-            else if(abs(angle_error) > 20)
-            {
-                if(angle_error > 0)
-                {
-                    continous_angle++;
-                    continous_angle = checkangle(continous_angle,6);
-                }
-                else
-                {
-                    continous_angle--;
-                    continous_angle = checkangle(continous_angle,-6);
-                }
-            }
-            else if(abs(angle_error) > 10)
+            // if(abs(angle_error) > 30)
+            // {
+            //     if(angle_error > 0)
+            //     {
+            //         continous_angle++;
+            //         continous_angle = checkangle(continous_angle,8);
+            //     }
+            //     else
+            //     {
+            //         continous_angle--;
+            //         continous_angle = checkangle(continous_angle,-8);
+            //     }
+            // }
+            // else if(abs(angle_error) > 20)
+            // {
+            //     if(angle_error > 0)
+            //     {
+            //         continous_angle++;
+            //         continous_angle = checkangle(continous_angle,6);
+            //     }
+            //     else
+            //     {
+            //         continous_angle--;
+            //         continous_angle = checkangle(continous_angle,-6);
+            //     }
+            // }
+            if(abs(angle_error) > 10)
             {
                 if(angle_error > 0)
                 {
@@ -161,17 +161,16 @@ void Wstrategy::Track()
                     continous_angle = checkangle(continous_angle,-4);
                 }
             }
-            else 
-            if(abs(angle_error) > 2)
+            else if(abs(angle_error) > 2)
             {
                 if(angle_error > 0)
                 {
-                    // continous_angle++;
+                    continous_angle++;
                     continous_angle = checkangle(continous_angle,2);
                 }
                 else
                 {
-                    // continous_angle--;
+                    continous_angle--;
                     continous_angle = checkangle(continous_angle,-2);
                 }
             }
@@ -182,8 +181,8 @@ void Wstrategy::Track()
 
             if(dis > 20)
             {
-                continous_x = 3000;
-                continous_x = checkcontinousX(continous_x,3100);
+                continous_x = 1000;
+                continous_x = checkcontinousX(continous_x,1100);
             // }
             // else if(dis > 200)
             // {
@@ -237,7 +236,7 @@ void Wstrategy::publishparam(int continous_x,int continous_y, int continous_angl
     double timer = difftime(end, start);
     ROS_INFO("timer = %f",timer);
     tku_msgs::GetVelocity msg_GetVelocity;
-    msg_GetVelocity.x = 3.0;
+    msg_GetVelocity.x = 1.0;
     msg_GetVelocity.y = 0.0;
     msg_GetVelocity.thta = (float)1.0;
     msg_GetVelocity.moving = moving;
